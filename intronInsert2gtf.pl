@@ -48,3 +48,5 @@ foreach my $i(0..($#line-1)){
     }
 }
 }
+unlink "$gencode_file.tmp";
+
