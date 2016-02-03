@@ -1,17 +1,26 @@
 #!/usr/bin/perl
 
-# Add the coordinate of introns to GENCODE GTF file based on transcript id.
+# estimate the length of the Introns from GENCODE GTF file
 # Contact: Shicheng Guo
 # Version 1.3
-# Update: 2016-02-03
+# Update: 2016-01-19
 
-use strict;
-use warnings;
 die "perl intronInsert2GTF GENCODE.gtf\n" if scalar(@ARGV<1);
 my $gencode_file=shift @ARGV;
 
+open I,$gencode_file;
+open OUT,">$gencode_file.tmp";
+while(<I>){
+print OUT $_ if /^#/i;
+my ($chr, $source, $type, $start, $end, $score, $strand, $phase, $attributes) = split("\t");
+print OUT $_ if $type eq 'gene';
+print OUT $_ if $type eq 'transcript';
+print OUT $_ if $type eq 'exon';
+}
+close OUT;
+
 my @line;
-open IN, $gencode_file or die "Can't open $gencode_file.\n";
+open IN, "$gencode_file.tmp" or die "Can't open $gencode_file.\n";
 @line=<IN>;
 close IN;
 
