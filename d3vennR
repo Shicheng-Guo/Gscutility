@@ -1,5 +1,7 @@
+#!/usr/bin/R
 
 devtools::install_github("timelyportfolio/d3vennR")
+
 library("d3vennR")
 d3vennR(
   data = list(
