@@ -12,3 +12,4 @@
  cd /home/shg047/oasis/Haib/sortBam
  ../mergedBam2hapInfo.pl ./haib.RD10_80up.genomecov.bed haib.merge.sort.bam > Haib.merge.RD10_80up.hapinfo.txt  # get hapinfo
  ../hapInfo2mld_block.pl ./Haib.merge.RD10_80up.hapinfo.txt 0.5 >  Haib.merge_RD10_80up.mld_blocks_r2-0.5.bed   # get methylation block
+
