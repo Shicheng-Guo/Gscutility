@@ -5,9 +5,6 @@
 # Version 1.3
 # Update: 2016-02-21
 # Contact: Shicheng Guo<scguo@ucsd.edu>; Kun Zhang<kzhang@eng.ucsd.edu>
-
-#!/usr/bin/perl
-#table2wikitable.pl
 use strict;
 use Cwd;
 chdir getcwd;
