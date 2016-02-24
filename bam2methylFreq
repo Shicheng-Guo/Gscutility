@@ -1,35 +1,32 @@
 #!/usr/bin/perl -w
 
-# bismark to alignment single-end fastq in same project
+# extract methBedGraph from unsorted bam file (both for single and pair-end. reads should be sort by reads name for pair-end bam)
 # Good habit to creat parameter table for a project
 # Contact: Shicheng Guo
 # Version 1.3
-# Update: Feb/5/2016
+# Update: Feb/28/2016
 
 use strict;
 use Cwd;
 my $dir=getcwd;
-die "non-submit: perl bam2sortbam.pl ../Sample.info.txt 0 \nsubmit: perl bam2sortbam.pl ../Sample.info.txt 1\n" if scalar(@ARGV)<1;
+die "Usage: perl ../bam2sortbam.pl <./BAM_Directory>\n" if scalar(@ARGV)<1;
 my $submit=shift @ARGV;
 
-my @bamFile=glob("*sort.bam");
-my $project="Ho";
-my $analysis="Lung";
+my @bamFile=glob("*.bam");
 my $curr_dir = $dir;
 my $queue="glean";
-my $ppn=1;
-my $walltime="72:00:00";
+my $ppn=6;
+my $walltime="6:00:00";
 
 foreach my $bamfile(@bamFile){
-my ($sampleid,undef)=split /\.sort.bam/,$bamfile;
-# next if -e "$sampleid.sort.bam";
-my $job_file_name = $bamfile.".methylFreq.job";
+my ($sampleid,undef)=split /.bam/,$bamfile;
+my $job_file_name = $bamfile . ".sortbam2methylfreq.job";
 my $status_file = $bamfile.".status";
-
+mkdir "../methyfreq" if ! -e "../methyfreq";
 print "$sampleid.sort.bam\n";
 open(OUT, ">$job_file_name") || die("Error in opening file $job_file_name.\n");
 print OUT "#!/bin/csh\n";
-print OUT "#PBS -n $bamfile\n";
+print OUT "#PBS -N $bamfile\n";
 print OUT "#PBS -q $queue\n";
 print OUT "#PBS -l nodes=1:ppn=$ppn\n";
 print OUT "#PBS -l walltime=$walltime\n";
@@ -40,24 +37,19 @@ print OUT "#PBS -M shihcheng.guo\@gmail.com \n";
 print OUT "#PBS -m abe\n";
 print OUT "#PBS -A k4zhang-group\n";
 print OUT "cd $curr_dir\n";
-# print OUT "samtools sort $bamfile -o $sampleid.sort.bam\n";
-# print OUT "samtools index $sampleid.sort.bam\n";
-my $is_pairedEnd= & is_bamPE("$sampleid.sort.bam");
-print OUT "bismark_methylation_extractor $is_pairedEnd --bedGraph --ignore 3 --buffer_size 4G --zero_based --comprehensive --output ../methyfreq  $sampleid.sort.bam";
+my $is_pairedEnd= & is_bamPE("$bamfile");
+print "$bamfile: $is_pairedEnd ...\n";
+print OUT "bismark_methylation_extractor $is_pairedEnd --bedGraph --multicore 3 --ignore 3 --ignore_3prime 3 --ignore_r2 5 --ignore_3prime_r2 5 --gzip --buffer_size 4G --zero_based --comprehensive --output ../methyfreq  $bamfile\n";
+print OUT "rm CHG_context*.gz CpG_context*.gz CHH_context*.gz *bedGraph.gz *bismark.cov.gz\n";
 close OUT;
-if($submit){
-    system("qsub $job_file_name");
-    }
+system("qsub $job_file_name");
 }
-
 
 sub is_bamPE($){
   my($bamfile)=@_;
   my $is_pairedEnd;
-  chomp( my $line=`samtools view $bamfile | head -n 1| awk '{print \$2}'`);
-  my $remainder=$line%2;
-  print "$line\t$remainder\n";
-  if($remainder){
+  my $line=`samtools view $bamfile | head -n 1| awk '{print \$2}'`;
+  if($line % 2){
   $is_pairedEnd="--paired-end"
   }else{
   $is_pairedEnd="--single-end"
