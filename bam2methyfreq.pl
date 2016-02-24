@@ -40,7 +40,6 @@ print OUT "cd $curr_dir\n";
 my $is_pairedEnd= & is_bamPE("$bamfile");
 print "$bamfile: $is_pairedEnd ...\n";
 print OUT "bismark_methylation_extractor $is_pairedEnd --bedGraph --multicore 3 --ignore 3 --ignore_3prime 3 --ignore_r2 5 --ignore_3prime_r2 5 --gzip --buffer_size 4G --zero_based --comprehensive --output ../methyfreq  $bamfile\n";
-print OUT "rm CHG_context*.gz CpG_context*.gz CHH_context*.gz *bedGraph.gz *bismark.cov.gz\n";
 close OUT;
 system("qsub $job_file_name");
 }
