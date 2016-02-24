@@ -1,10 +1,5 @@
-#!/usr/bin/perl -w
-
-# estimate the length of the Introns from GENCODE GTF file
-# Contact: Shicheng Guo
-# Version 1.3
-# Update: 2016-02-21
-# Contact: Shicheng Guo<scguo@ucsd.edu>; Kun Zhang<kzhang@eng.ucsd.edu>
+#!/usr/bin/perl
+#table2wikitable.pl
 use strict;
 use Cwd;
 chdir getcwd;
@@ -12,19 +7,19 @@ chdir getcwd;
 my $input=@ARGV[0];
 
 open F,$input;
-print "\{|{{table}}\n";
 while(<F>){
 chomp;
 my @line=split /\t/;
 if($. eq 1){
-print "{|style=\"font-size:80%;\"\m"
+print "{|style=\"font-size:80%;\"\n";
 foreach my $ele(@line){
-print "|align=\"center\" style=\"background:#f0f0f0;\"|\'\'\' $ele\'\'\'\n";	
+print "|align=\"center\" style=\"background:#f0f0f0;\"|\'\'\' $ele\'\'\'\n";
 }
 print "|-\n";
 }else{
 my $tmp=join("||",@line);
 print "| $tmp\n|-\n";
 }
-print"|\}\n";
 }
+
+print"|\}\n";
