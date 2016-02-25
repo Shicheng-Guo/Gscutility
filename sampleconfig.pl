@@ -1,4 +1,3 @@
-
 #!/usr/bin/perl -w
 
 # Transfer Bam to Fastq with samtools command
@@ -14,10 +13,10 @@ chdir getcwd;
 my %sam;
 my @fastq=glob("*fastq.gz");
 foreach my $fastq(@fastq){
-        my($sample,undef)=split /[_.]/,$fastq;
-        $sam{$sample}=$sample;
+	my($sample,undef)=split /[_.]/,$fastq;
+	$sam{$sample}=$sample;
 }
 
 foreach my $sam (sort keys %sam){
-        print "$sam\_1.fastq.gz\t$sam\_2.fastq.gz\n"
+	print "$sam\_1.fastq.gz\t$sam\_2.fastq.gz\t$sam\_1.trimmed.fq.gz\n"
 }
