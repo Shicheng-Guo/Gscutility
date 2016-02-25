@@ -1,8 +1,4 @@
 #!/usr/bin/perl -w
-# Haplotype to linkage disequlibrium R-square.
-# Contact: Dinh Diep <hdinhdp@gmail.com> and Shicheng Guo <Shicheng.Guo@Hotmail.com>
-# Version 1.3
-# Update: Jan/29/2016
 # this script reads in a haploInfo file and output the rsq value for each pair of cg sites
 
 use strict;
@@ -342,8 +338,15 @@ sub findMaxBlockInRegion(){
 }
 
 sub printUsage{
-	print " Usage: perl ~/bin/cgLD_Analysis_haploInfo_permuteRsq_v2.pl outputfile.txt chr2:15468742-15469742 < haploInfo.txt\nhaploInfo.txt: chr10:10000873-10001472	CCC	1	10001056,10001082,10001168\n";
-	exit 0;
+        print " Usage:\n";
+		print " perl ~/monod/bin/$0 <rlt_prefix> <chr:start-end> < haploinfo.input.txt\n";
+		print " For example:\n perl $0 rlt chr10:10000873-10001472 < haploinfo.input.txt\n\n";
+		print "-----------------------------------------------------------------------------\n";
+		print " haploinfo.input.txt format:\n";
+		print " chr10:10000873-10001472        CCC     1       10001056,10001082,10001168\n\n";
+    	print "-----------------------------------------------------------------------------\n";
+        exit 0;
 }
+
 
 main();
