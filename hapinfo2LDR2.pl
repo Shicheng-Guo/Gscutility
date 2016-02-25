@@ -1,6 +1,5 @@
 #!/usr/bin/perl -w
-# This is most complicated situation for RRBS or BS alignment since both single end and pair-end fastq were created in a project.
-# Run the script to the Bam directory of the bismark
+# Haplotype to linkage disequlibrium R-square.
 # Contact: Dinh Diep <hdinhdp@gmail.com> and Shicheng Guo <Shicheng.Guo@Hotmail.com>
 # Version 1.3
 # Update: Jan/29/2016
@@ -343,8 +342,7 @@ sub findMaxBlockInRegion(){
 }
 
 sub printUsage{
-	print " Usage: \n";
-	print " ./cgLD_Analysis_haploInfo_permuteRsq_v2.pl outputfile.txt chr2:15468742-15469742 < haploInfo.txt\nhaploInfo.txt: chr10:10000873-10001472	CCC	1	10001056,10001082,10001168\n";
+	print " Usage: perl ~/bin/cgLD_Analysis_haploInfo_permuteRsq_v2.pl outputfile.txt chr2:15468742-15469742 < haploInfo.txt\nhaploInfo.txt: chr10:10000873-10001472	CCC	1	10001056,10001082,10001168\n";
 	exit 0;
 }
 
