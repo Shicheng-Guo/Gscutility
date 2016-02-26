@@ -1,6 +1,13 @@
 #!/usr/bin/perl -w
 # this script reads in a haploInfo file and output the rsq value for each pair of cg sites
+# Transfer Bam to Fastq with samtools command
+# Run the script to the Bam directory
+# Contact: Shicheng Guo
+# Version 1.3
+# Update: 2016-02-25
 
+
+use strict;
 use strict;
 use warnings;
 use Sort::Array qw/Sort_Table/;
@@ -29,11 +36,12 @@ printUsage() if(!$ARGV[0]);
 my ($target_chr, $target_start, $target_end) = split /[:-]/, $ARGV[1];
 
 sub main{
-	#readCGTable();
 	while(my $line = <STDIN>){
+		next if $line=~/^\s+$/;
 		chomp($line);
 		#chr10:10000873-10001472	CCC	1	10001056,10001082,10001168
 		my @tmp =  split /\t/, $line;
+		next if ! defined($tmp[1]);
 		my ($chr, $start, $end) = split /[:-]/, $tmp[0];
 		next if($chr ne $target_chr || $start > $target_end || $end < $target_start);
 		my ($hapString, $hapCount) = ($tmp[1], $tmp[2]);
