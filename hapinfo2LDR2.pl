@@ -38,11 +38,10 @@ my ($target_chr, $target_start, $target_end) = split /[:-]/, $ARGV[1];
 sub main{
 	while(my $line = <STDIN>){
 		next if $line=~/^\s+$/;
-		chomp($line);
-		#chr10:10000873-10001472	CCC	1	10001056,10001082,10001168
-		my @tmp =  split /\t/, $line;
-		next if ! defined($tmp[1]);
-		my ($chr, $start, $end) = split /[:-]/, $tmp[0];
+         	chomp($line);
+		my @tmp =  split /\s+/, $line;
+                next if scalar(@tmp)<4;
+                my ($chr, $start, $end) = split /[:-]/, $tmp[0];
 		next if($chr ne $target_chr || $start > $target_end || $end < $target_start);
 		my ($hapString, $hapCount) = ($tmp[1], $tmp[2]);
 		my @cgPos = split ",", $tmp[3];
@@ -358,3 +357,4 @@ sub printUsage{
 
 
 main();
+
