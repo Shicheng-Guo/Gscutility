@@ -16,7 +16,7 @@ my %mch_load_matrix;
 my %probe_HMH_samples;
 my %hap_count_matrix;
 chdir shift @ARGV;
-my @hapInfo_files= globe("*.hapInfo.txt");
+my @hapInfo_files= glob("*.hapInfo.txt");
 my @sample_list;
 foreach my $hapInfo_file(@hapInfo_files){
 	my $sample_name = $hapInfo_file;
