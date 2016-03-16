@@ -2,11 +2,12 @@
 use strict;
 use Cwd;
 my $dir=getcwd;
+chdir $dir;
 my @file=glob("*gz");
 
 foreach my $file(@file){
- my $pbs_job_submit=">$file.gzcheck.job";
- open OUT,$pbs_job_submit;
+ my $pbs_job_submit="$file.gzcheck.job";
+ open OUT,">$pbs_job_submit";
  print OUT "#!/bin/csh\n";
  print OUT "#PBS -N $file.job\n";
  print OUT "#PBS -q glean\n";  # glean,condo,hotel
@@ -19,7 +20,7 @@ foreach my $file(@file){
  print OUT "#PBS -m abe\n";
  print OUT "#PBS -A k4zhang-group\n";
  print OUT "cd $dir\n";
- print OUT "gunzip -t $file\n";
+ print OUT "gunzip -c $file | head 2> $file.intact\n";
  close OUT;
  system("qsub $pbs_job_submit");
 }
