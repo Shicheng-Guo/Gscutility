@@ -21,7 +21,7 @@ while(<F>){
     my ($sample1,undef)=split /.fastq.gz|_1.fastq.gz|fq.gz|.gz/,$read[0];
 
     my $ppn=1;
-    my $walltime="7:00:00";
+    my $walltime="14:00:00";
     my $queue="glean"; # hotel, glean, pdafm
     
     my $job_file_name = $id . ".job";
