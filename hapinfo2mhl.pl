@@ -8,7 +8,7 @@
 use strict;
 use Cwd;
 my $usage = <<USAGE;
-perl haplo2hml.pl Directory_of_haploinfo
+perl $0 <directory_of_haploinfo|./>  > MHL.OUTPUT.txt 
 USAGE
 
 die $usage if @ARGV <1;
@@ -45,7 +45,7 @@ foreach my $probeID (keys(%hap_count_matrix)){
 		
 		foreach my $hapString (keys(%{$hap_count_matrix{$probeID}->{$sample_name}})){
 			for(my $word_size = 1; $word_size<=length($hapString); $word_size++){
-				next if($word_size>5);
+				next if($word_size>9);
 				for(my $i=0; $i<=length($hapString)-$word_size; $i++){
 					my $sub_hapString = substr($hapString,$i,$word_size);
 					next if($sub_hapString =~ /[NAG]/i);
@@ -76,12 +76,13 @@ foreach my $probeID (keys(%hap_count_matrix)){
 
 
 print "Probe_id\t", join("\t", @sample_list), "\n";
-foreach my $probeID (keys(%mch_load_matrix)){
+foreach my $probeID (sort keys(%mch_load_matrix)){
 	print "$probeID";
-	foreach my $sample_name(@sample_list){
-		$mch_load_matrix{$probeID}->{$sample_name}="NA" if(!$mch_load_matrix{$probeID}->{$sample_name});
+	foreach my $sample_name(sort @sample_list){
+		$mch_load_matrix{$probeID}->{$sample_name}="NA" if(! defined($mch_load_matrix{$probeID}->{$sample_name}));
 		print "\t", $mch_load_matrix{$probeID}->{$sample_name};
 	}
 	print "\n";
 }
+
 
