@@ -6,6 +6,7 @@ use strict;
 use Cwd;
 chdir getcwd;
 
+mkdir "../mergeHapinfo" if ! -e "../mergeHapinfo";
 my @file=glob("*hapInfo.txt");
 
 my %sam;
@@ -16,7 +17,7 @@ foreach my $file(@file){
 
 foreach my $sam(sort keys %sam){
 my @FileTmp=glob("$sam*");
-my $outFile="$sam.hapInfo.txt";
+my $outFile="../mergeHapinfo/$sam.hapInfo.txt";
 print "$outFile\n";
 open OUT,">$outFile";
 foreach my $filetmp(@FileTmp){
