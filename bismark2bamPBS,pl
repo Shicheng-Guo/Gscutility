@@ -9,10 +9,10 @@
 use strict;
 use Cwd;
 my $dir=getcwd;
+die USAGE() if scalar(@ARGV<2);
 
 my $sample_group_file=shift @ARGV;
 my $submit=shift @ARGV;
-die "non-submit: perl bismark2bam.pl ../Sample.info.txt 0 \nsubmit: perl bismark2bam.pl ../Sample.info.txt 1\n" if scalar(@ARGV<3);
 
 open F,"$sample_group_file";
 while(<F>){
@@ -31,8 +31,9 @@ while(<F>){
     my $multicore=6;
     my $walltime="72:00:00";
     my $queue="glean"; # hotel,pdafm,condo
-    chomp(my $phredcheck=`perl /home/shg047/bin/checkphred.pl $read[0]`);
-    my ($phred)=split /\s+/,$phredcheck;
+    # chomp(my $phredcheck=`perl /home/shg047/bin/checkphred.pl $read[0]`);
+    # my ($phred)=split /\s+/,$phredcheck;
+    my $phred=64;
     $phred="--phred$phred";
     
     open(OUT, ">$job_file_name") || die("Error in opening file $job_file_name.\n");   
@@ -55,7 +56,7 @@ while(<F>){
     print OUT "bismark --bowtie2 $phred-quals --fastq -L 30 -N 1 --multicore 6 /home/shg047/db/hg19/meth/bismark ../fastq_trim/$sample1\_trimmed.fq.gz -o ../bam2";  
     }
    close(OUT);
-   if($submit){
+   if($submit eq 'submit'){
    system("qsub $job_file_name");
    }
 }
@@ -75,3 +76,5 @@ BMT3.read1.fq.gz        BMT3.read2.fq.gz
 LTP1.read1.fq.gz        LTP1.read2.fq.gz
 ';
 }
+
+
