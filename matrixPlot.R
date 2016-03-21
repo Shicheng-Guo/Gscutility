@@ -10,11 +10,14 @@ opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 if (is.null(opt$input)){
   print_help(opt_parser)
-  stop("# Rscript --vanilla ~/bin/matrixPlot.R -i "input.txt" -o "output-prefix"\nAt least one argument must be supplied (input file).\n", call.=FALSE)
+  stop("At least one argument must be supplied (input file).\n", call.=FALSE)
 }
 
 
 data<-read.table(opt$input,sep="\t",head=T,row.names=1,check.names=F,as.is=T)
+miss.ratio<-sum(is.na(data))/(nrow(data)*ncol(data))
+print(paste("Miss ratio of the dataset is:",sprintf("%1.2f%%",100*miss.ratio),sep=" "))
+
 newdata<-data.frame(value=as.numeric(data.matrix(data)),Group=rep(colnames(data),each=nrow(data)))
 
 myData <- aggregate(newdata$value,by =list(type=newdata$Group),
