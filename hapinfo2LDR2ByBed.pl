@@ -27,7 +27,12 @@ $Rlt=$Rlt+$tmp;
 }
 }
 # print "-----------------------------------------------------------\n";
-my $output=$Rlt/$i;
+if($i>=1){
+my $output=$Rlt/($i);
+}else{
+my $output="NA";
+}
+
 print "$cor\t$output\n";
 }
 
