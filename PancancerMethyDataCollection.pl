@@ -2,7 +2,7 @@
 #version 3.1
 #update: mutiple cancer + latest version + special cpgsite 
 #update: filerecords
-#updata:
+#updata: April 20 2016
 # jhu-usc.edu_LUSC.HumanMethylation27.3.lvl-3.TCGA-BG-A0MS-01A-11D-A10Q-05.txt 
 # jhu-usc.edu_LGG.HumanMethylation450.11.lvl-3.TCGA-HT-A617-01A-11D-A29T-05.txt
 
