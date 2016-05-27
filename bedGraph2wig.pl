@@ -11,6 +11,7 @@
 # --compact : if selected, steps with value equal to 0 will not be printed. This saves space but was not allowed in original wig format, thus some scripts using wig file as input may not understand it.
 
 
+
 use strict;
 use warnings;
 use Getopt::Long;
@@ -18,6 +19,7 @@ use List::Util qw[min max];
 
 my $usage = "Usage: $0 --bedgraph <infile.bedgraph> --wig <outfile.wig> --step <step_size> [--compact]\n";
 
+die &USAGE if scalar(@ARGV)<3;
 # Parse command line arguments
 
 my $infile; # bedGraph input file name
@@ -126,4 +128,17 @@ sub print_wig_line {
   $$cur_pos = $$next_pos;
   $$next_pos = $$cur_pos + $step;
   $$cur_val = 0;
+}
+
+
+sub USAGE{
+
+print "\nUsage: bedgraph_to_wig.pl --bedgraph input.bedgraph --wig output.wig --step step_size [--compact]\n";
+
+print '
+--bedgraph : specify input file in bedGraph format.
+--wig : specify output file in fixedStep format.
+--step : specify step size. Note that span is set to be identical to step.
+--compact : if selected, steps with value equal to 0 will not be printed. This saves space but was not allowed in original wig format, thus some scripts using wig file as input may not understand it.
+'
 }
