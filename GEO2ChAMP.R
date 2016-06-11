@@ -22,9 +22,13 @@ beta.norm=myNorm
 compare.group = c("tumor","normal")
 mylimma=champ.MVP(beta.norm =myNorm, pd =pd, adjPVal = 0.05, adjust.method = "BH",compare.group = c("tumor","normal"), resultsDir = paste(getwd(), "resultsChamp", sep = "/"),bedFile = TRUE)
 library("doParallel")
-champ.DMR(betaNorm=data.matrix(myNorm),design=pd$Sample_Group,maxGap=300,
+result<-champ.DMR(betaNorm=data.matrix(myNorm),design=pd$Sample_Group,maxGap=300,
           cutoff=0.2,minProbes=3,smooth=TRUE,smoothFunction=loessByCluster,
           useWeights=FALSE,permutations=NULL,B=100,pickCutoff=FALSE,
           pickCutoffQ=0.99,nullMethod="bootstrap",verbose=TRUE,cores=5,arraytype="450K",
           method = "Bumphunter",resultsFile=mylimma,meanLassoRadius=375,minSigProbesLasso=3,minDmrSep=1000,
           minDmrSize=50,adjPvalProbe=0.05,adjPvalDmr=0.05,pData=pd)
+save(result,file="champ.DMR.RData")
+write.table(result$myDmrs,file="myDmrs.txt",col.names=NA,row.names=T,sep="\t",quote=F)
+write.table(result$myDmrProbes,file="myDmrProbes.txt",col.names=NA,row.names=T,sep="\t",quote=F)
+
