@@ -14,7 +14,6 @@ GSIMethDecon<-function(data){
   gmaxgroup<-c(gmaxgroup,gmax)
   gsi<-c(gsi,gsit)
   avebase<-rbind(avebase,ave)
-  print(i)
   }
   rlt=data.frame(region=rownames(data),group=gmaxgroup,GSI=gsi,AVE=avebase)
   rlt<-gsi[-which(gsi[,2]!="WBC" & gsi[,grep("WBC",colnames(gsi))]>0.1),]
