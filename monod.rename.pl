@@ -8,7 +8,7 @@ foreach my $file(@file){
         my ($cancer,$type,$id)=split /[.-]/g,$file;
         my $id2 = sprintf("%03d",$id);
         system("cp $file CRC-$type-$id2.bam");
-        print "$id\t$id2\n";
+        print "$file\t$id\t$id2\tCRC-$type-$id2.bam\n";
 }
 
 my @file=glob("RRBS-6P*.bam");
@@ -16,10 +16,10 @@ my $i;
 foreach my $file(@file){
         $i++;
         $j++;
-        my (undef,$cancer,$type,$id)=split /[.P-]/g,$file;
+        my (undef,$cancer,$id)=split /[.P-]/g,$file;
         my $id2 = sprintf("%03d",$id);
         system("cp $file CRC-P-$id2.bam");
-        print "$id\t$id2\n";
+        print "$file\t$id\t$id2\tCRC-$type-$id2.bam\n";
 }
 
 
@@ -31,7 +31,7 @@ foreach my $file(@file){
         my ($cancer,$type,$id)=split /[.-]/g,$file;
         my $id2 = sprintf("%03d",$id);
         system("cp $file LC-$type-$id2.bam");
-        print "$id\t$id2\n";
+        print "$file\t$id\t$id2\tCRC-$type-$id2.bam\n";
 }
 
 
@@ -40,10 +40,10 @@ my $i;
 foreach my $file(@file){
         $i++;
         $j++;
-        my (undef,$cancer,$type,$id)=split /[.P-]/g,$file;
+        my (undef,$cancer,$id)=split /[.P-]/g,$file;
         my $id2 = sprintf("%03d",$id);
         system("cp $file LC-P-$id2.bam");
-        print "$id\t$id2\n";
+        print "$file\t$id\t$id2\tCRC-$type-$id2.bam\n";
 }
 
 use strict;
@@ -55,7 +55,7 @@ foreach my $file(@file){
         my ($cancer,$type,$id)=split /[.-]/g,$file;
         my $id2 = sprintf("%03d",$id);
         system("cp $file PC-$type-$id2.bam");
-        print "$id\t$id2\n";
+        print "$file\t$id\t$id2\tCRC-$type-$id2.bam\n";
 }
 
 
@@ -67,10 +67,8 @@ foreach my $file(@file){
         my ($cancer,$type,$id)=split /[.-]/g,$file;
         my $id2 = sprintf("%03d",$id);
         system("cp $file NC-$type-$id2.bam");
-        print "$id\t$id2\n";
+        print "$file\t$id\t$id2\tCRC-$type-$id2.bam\n";
 }
-
-
 
 
 
