@@ -31,7 +31,7 @@ foreach my $file(@file){
         my ($cancer,$type,$id)=split /[.-]/g,$file;
         my $id2 = sprintf("%03d",$id);
         system("cp $file LC-$type-$id2.bam");
-        print "$file\t$id\t$id2\tCRC-$type-$id2.bam\n";
+        print "$file\t$id\t$id2\tLC-$type-$id2.bam\n";
 }
 
 
@@ -55,7 +55,7 @@ foreach my $file(@file){
         my ($cancer,$type,$id)=split /[.-]/g,$file;
         my $id2 = sprintf("%03d",$id);
         system("cp $file PC-$type-$id2.bam");
-        print "$file\t$id\t$id2\tCRC-$type-$id2.bam\n";
+        print "$file\t$id\t$id2\tPC-$type-$id2.bam\n";
 }
 
 
@@ -67,7 +67,7 @@ foreach my $file(@file){
         my ($cancer,$type,$id)=split /[.-]/g,$file;
         my $id2 = sprintf("%03d",$id);
         system("cp $file NC-$type-$id2.bam");
-        print "$file\t$id\t$id2\tCRC-$type-$id2.bam\n";
+        print "$file\t$id\t$id2\tNC-$type-$id2.bam\n";
 }
 
 
