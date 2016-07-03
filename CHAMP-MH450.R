@@ -7,6 +7,7 @@
 #================================================================================================================
 
 library("ChAMP")
+biocLite("ChAMP")
 data<-list()
 beta=data.frame(abs(matrix(rnorm(10*6,0.1,0.2),10,5)),abs(matrix(rnorm(10*6,0.8,0.2),10,5)))
 colnames(beta)=c(paste("T",1:5,sep=""),paste("C",1:5,sep=""))
