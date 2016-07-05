@@ -1,6 +1,6 @@
 # run the script in the fold of idat of HM450
 # update in April 2016
-
+#
 library("ChAMP")
 library("outliers")
 setwd("/home/sguo/dyh/idat")
