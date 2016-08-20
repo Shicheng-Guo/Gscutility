@@ -16,7 +16,7 @@ my $project="Fastq";
 my $analysis="";
 my $ppn=1;
 my $walltime="7:00:00";
-my $queue="glean"; # hotel
+my $queue="home-k4zhang"; # hotel
 
 open F,$sraFiles;
 while(<F>){
@@ -25,26 +25,29 @@ while(<F>){
     next if /^\s+$/;
     my @line = split /\t/;
     my $id=$line[$SRR_column-1];
+    print "$id\n";
     # next if -e "$id.fastq.gz"; # SRR1035764.fastq.gz
-    my $job_file_name = $id . "fastq.download.job";
+    my $job_file_name = $id . ".fastq.download.job";
     my $status_file = $id.".status";
     my $curr_dir = $dir;
     open(OUT, ">$job_file_name") || die("Error in opening file $job_file_name.\n");
     print OUT "#!/bin/csh\n";
-    print OUT "#PBS -N Down.$id\n";
+    print OUT "#PBS -N $id\n";
     print OUT "#PBS -q $queue\n";  # glean is free, pdafm
     print OUT "#PBS -l nodes=1:ppn=$ppn\n";
     print OUT "#PBS -l walltime=$walltime\n";
     print OUT "#PBS -o ".$id.".download.log\n";
     print OUT "#PBS -e ".$id.".download.err\n";
     print OUT "#PBS -V\n";
-    print OUT "#PBS -M shihcheng.guo\@gmail.com \n";
+    print OUT "#PBS -M shicheng.guo\@gmail.com \n";
     print OUT "#PBS -m abe\n";
     print OUT "#PBS -A k4zhang-group\n";
     print OUT "cd $curr_dir\n";
-    print OUT "fastq-dump --split-files --gzip $id\n";
+    print OUT "fastq-dump --split-files --gzip $id\n";    
     close(OUT);
     if($submit eq 'submit'){
     system("qsub $job_file_name");
    }
 }
+
+
