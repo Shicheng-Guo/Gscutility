@@ -85,6 +85,7 @@ Previous Script:
 1, Download or Prepare SRA Download Configure  (http://www.ebi.ac.uk/ena/data/view/SRP028600)
 2, perl fastqDownload.pl SamConfig.txt 8 submit   (fastq-dump --split-files --gzip)
 3, trim_galore --phred33 --fastqc --stringency 3 -q 20 --trim1 --length 20 --gzip --clip_R1 2 --three_prime_clip_R1 2 --illumina SRR299055_1.fastq.gz --output_dir ../fastq_trim
+4, bismark_genome_preparation ./     # merge all the fa to one file (mm9.fa or hg19.fa)
 --------------------------------------------------------------------------------------------------------------
 ';
 
