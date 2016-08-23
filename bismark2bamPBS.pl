@@ -65,17 +65,28 @@ while(<F>){
 }
 
 sub USAGE{
-print "\nUSAGE: $0 Sam_Config_File submit\n";
+print "\nUSAGE: $0 SamConfigFile submit\n";
 print '
-Group_of_Sample Format:
+--------------------------------------------------------------------------------------------------------------
+This command will trim the Fastq files with trim_galore for single-end and pair-end BS-seq data simultaniously. 
+
+Example:  perl fastq2trimfastq.pl FastqMatchConfig.txt submit
+
+SamConfigFile Format:
 HOT243.fq.gz
 HOT265.fq.gz
-HOT273.fq.gz
-TBR34prePlsm.fq.gz
-TBR36prePlsm.fq.gz
 BMT1.read1.fq.gz        BMT1.read2.fq.gz
 BMT2.read1.fq.gz        BMT2.read2.fq.gz
-BMT3.read1.fq.gz        BMT3.read2.fq.gz
-LTP1.read1.fq.gz        LTP1.read2.fq.gz
+
+submit|notsumbit: indicate qsub job to TSCC or not?
+The trimed fastq will be save in ../fastq_trim. 
+
+Previous Script: 
+1, Download or Prepare SRA Download Configure  (http://www.ebi.ac.uk/ena/data/view/SRP028600)
+2, perl fastqDownload.pl SamConfig.txt 8 submit   (fastq-dump --split-files --gzip)
+3, trim_galore --phred33 --fastqc --stringency 3 -q 20 --trim1 --length 20 --gzip --clip_R1 2 --three_prime_clip_R1 2 --illumina SRR299055_1.fastq.gz --output_dir ../fastq_trim
+--------------------------------------------------------------------------------------------------------------
 ';
+
+
 }
