@@ -20,7 +20,7 @@ while(<F>){
     next if /^\s+$/;
     my @read = split /\t/;
     my $id=$read[0];
-    my ($sample1,undef)=split /.fq.gz/,$read[0];
+    my ($sample1,undef)=split /.fastq.gz/,$read[0];
     my $project="DE";
     my $analysis="AL";
     my $job_file_name = $id . ".job";
@@ -29,11 +29,11 @@ while(<F>){
     
     my $ppn=16;
     my $multicore=6;
-    my $walltime="72:00:00";
-    my $queue="glean"; # hotel,pdafm,condo
+    my $walltime="167:00:00";
+    my $queue="hotel"; # hotel,pdafm,condo
     # chomp(my $phredcheck=`perl /home/shg047/bin/checkphred.pl $read[0]`);
     # my ($phred)=split /\s+/,$phredcheck;
-    my $phred=64;
+    my $phred=33;
     $phred="--phred$phred";
     
     open(OUT, ">$job_file_name") || die("Error in opening file $job_file_name.\n");   
@@ -45,15 +45,18 @@ while(<F>){
     print OUT "#PBS -o ".$id.".log\n";
     print OUT "#PBS -e ".$id.".err\n";
     print OUT "#PBS -V\n";
-    print OUT "#PBS -M shihcheng.guo\@gmail.com \n";
+    print OUT "#PBS -M shicheng.guo\@gmail.com \n";
     print OUT "#PBS -m abe\n";
     print OUT "#PBS -A k4zhang-group\n";
     print OUT "cd $curr_dir\n";
+    print "$job_file_name\n";
     if(scalar(@read) eq 2){
     my ($sample2,undef)=split /.fq.gz/,$read[1];
-    print OUT "bismark --bowtie2 $phred-quals --fastq -L 30 -N 1 --multicore 6 /home/shg047/db/hg19/meth/bismark -1 ../fastq_trim/$sample1\_val_1.fq.gz -2 ../fastq_trim/$sample2\_val_2.fq.gz  -o ../bam";
+    # print OUT "bismark --bowtie2 $phred-quals --fastq -L 30 -N 1 --multicore 6 /home/shg047/db/hg19/meth/bismark -1 ../fastq_trim/$sample1\_val_1.fq.gz -2 ../fastq_trim/$sample2\_val_2.fq.gz  -o ../bam";
+    print OUT "bismark --bowtie2 $phred-quals --fastq -L 30 -N 1 --multicore 6 /home/shg047/db/mm9 -1 ../fastq_trim/$sample1\_val_1.fq.gz -2 ../fastq_trim/$sample2\_val_2.fq.gz  -o ../bam";
     }else{
-    print OUT "bismark --bowtie2 $phred-quals --fastq -L 30 -N 1 --multicore 6 /home/shg047/db/hg19/meth/bismark ../fastq_trim/$sample1\_trimmed.fq.gz -o ../bam2";  
+    # print OUT "bismark --bowtie2 $phred-quals --fastq -L 30 -N 1 --multicore 6 /home/shg047/db/hg19/meth/bismark ../fastq_trim/$sample1\_trimmed.fq.gz -o ../bam2";  
+    print OUT "bismark --bowtie2 $phred-quals --fastq -L 30 -N 1 --multicore 6 /home/shg047/db/mm9 ../fastq_trim/$sample1\_trimmed.fq.gz -o ../bam";  
     }
    close(OUT);
    if($submit eq 'submit'){
@@ -76,5 +79,3 @@ BMT3.read1.fq.gz        BMT3.read2.fq.gz
 LTP1.read1.fq.gz        LTP1.read2.fq.gz
 ';
 }
-
-
