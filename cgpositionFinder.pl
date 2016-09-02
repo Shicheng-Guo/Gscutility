@@ -4,7 +4,11 @@
 my $fa=shift @ARGV;
 open F,$fa;
 my $seq;
+my($chr,undef)=split/.fa/,$fa;
+my $out="$chr.cg.pos";
+open F,$fa;
 while(<F>){
+next if />/;
 chomp;
 $seq .=$_;
 }
@@ -26,27 +30,15 @@ sub all_match_positions {
 
 my $regex='CG';
 my $string=$seq;
-my $cgap=3;    
+my $cgap=3;
 my @pos=all_match_positions($regex,$string);
 my @hgcg;
+open OUT,">$out";
 foreach my $pos(@pos){
     push @hgcg,@$pos[1];
 }
 foreach my $i(0..($#hgcg)){
-my $pos=$hgcg[$i]-1;  # transfer to 0-based coordinate 
-print "$chr\t$pos\n"; 
+my $pos=$hgcg[$i]-1;  # transfer to 0-based coordinate
+print OUT "$chr\t$pos\n";
 }
-
-
-sub USAGE(){
-print "
-------------------------------------------
-perl $0 chr12.fa 
-
-Find all the CpG postion (0-base) from genome Fa files (Download from UCSC)
-
-
-------------------------------------------
-"
-}
-
+close OUT;
