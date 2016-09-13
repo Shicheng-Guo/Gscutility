@@ -1,0 +1,17 @@
+#!/bin/csh
+#PBS -q hotel
+#PBS -l nodes=1:ppn=2
+#PBS -l walltime=168:00:00
+#PBS -o SRX1091395.log
+#PBS -e SRX1091395.err
+#PBS -V
+#PBS -M shicheng.guo@gmail.com
+#PBS -m abe
+#PBS -A k4zhang-group
+cd /oasis/tscc/scratch/shg047/mouse/bam
+samtools merge -@ 2 ../mergeBam/SRX1091395.bam SRR2096273_1_val_1_bismark_bt2_pe.bam
+samtools sort -o ../SortMergeBam/SRX1091395.sortn.bam ../mergeBam/SRX1091395.bam
+samtools index ../SortMergeBam/SRX1091395.sortn.bam
+bismark_methylation_extractor --paired-end --bedGraph --multicore 2 --ignore 3 --ignore_3prime 3 --ignore_r2 5 --ignore_3prime_r2 5 --gzip --buffer_size 4G --zero_based --comprehensive --output ../methyfreq  ../SortMergeBam/SRX1091395.sortn.bam
+samtools sort ../mergeBam/SRX1091395.bam ../SortMergeBam/SRX1091395.sortc.bam
+samtools index ../SortMergeBam/SRX1091395.sortc.bam
