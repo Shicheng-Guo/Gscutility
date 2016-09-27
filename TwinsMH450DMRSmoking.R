@@ -1,5 +1,6 @@
 # use latest champ in lastest R version. 
-# July 8th 2016
+# Sep 26th 2016
+# We obtain 12 pairs twins mh450K array (smoking vs non-smoking)
 
 DMR.CHAMP<-function(){
   library("ChAMP")
