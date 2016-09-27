@@ -1,6 +1,7 @@
 # use latest champ in lastest R version. 
 # Sep 26th 2016
-# We obtain 12 pairs twins mh450K array (smoking vs non-smoking)
+# We obtain 12 pairs twins mh450K array (smoking vs non-smoking). 
+# All are male and the age is quite nearby (almost 45-55 years of old)
 
 DMR.CHAMP<-function(){
   library("ChAMP")
