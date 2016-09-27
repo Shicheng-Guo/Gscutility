@@ -1,11 +1,11 @@
-
-HeatMap<-function(data,phen,varselect=12000,plot="heatmap.pdf",cexRow = 0.01,cexCol = 1.2,Colv=T,Rowv=T){
-#  subset<-order(unlist(apply(data,1,function(x) sd(x,na.rm=T))),decreasing=T)[1:4000]
+HeatMap<-function(data,phen,varselect=1000,plot="heatmap.pdf",cexRow = 0.01,cexCol = 1.2,Colv=T,Rowv=T){
+  print("Heatmap plot: p rows (variables) x N columns (objects), be sure rownames should be unique")
+  library("gplots")
+  #  subset<-order(unlist(apply(data,1,function(x) sd(x,na.rm=T))),decreasing=T)[1:4000]
   x1<-which(phen==unique(phen)[1])
   x2<-which(phen==unique(phen)[2])
   subset<-order(unlist(apply(data,1,function(x) t.test(x[x1],x[x2])$p.value)),decreasing=F)[1:varselect]  
   data<-data[subset,]
-  library("gplots")
   colors <- colorpanel(75,"midnightblue","mediumseagreen","yellow") 
   colors <-bluered(75)
   colors <-greenred(75)
@@ -19,4 +19,3 @@ HeatMap<-function(data,phen,varselect=12000,plot="heatmap.pdf",cexRow = 0.01,cex
   heatmap.2(data,trace="none",cexRow = cexRow,cexCol = cexCol, ColSideColors=ColSideColors,density.info="none",col=colors,Colv=Colv,Rowv=Rowv,keysize=0.9, margins = c(5, 10))
   dev.off()
 }
-HeatMap(data=myNorm$beta,phen=c(rep('T',3),rep('C',2),rep('T',7)),varselect=124000,plot="heatmap.124000.pdf")
