@@ -1,7 +1,6 @@
 # use latest champ in lastest R version. 
 # Sep 26th 2016
-# We obtain 12 pairs twins mh450K array (smoking vs non-smoking). 
-# All are male and the age is quite nearby (almost 45-55 years of old)
+# We obtain 12 pairs twins mh450K array (smoking vs non-smoking)
 
 DMR.CHAMP<-function(){
   library("ChAMP")
@@ -19,7 +18,7 @@ DMR.CHAMP<-function(){
   #              adjPVal = 0.05, runDMR = TRUE, runCNA = FALSE, plotBMIQ = FALSE, DMRpval = 0.05,
   #              sampleCNA=FALSE,plotSample = TRUE,groupFreqPlots=TRUE,freqThreshold=0.3, bedFile
   #              = TRUE, methProfile = TRUE, controlProfile = FALSE)
-  myLoad<-champ.load(directory = getwd(),filterBeads=TRUE,QCimages = F)
+  myLoad<-champ.load(directory = getwd(),filterDetP=F,filterBeads=F,QCimages = F,filterXY=F,filterSNPs=F,filterMultiHit=F)
   # champ.CNA(intensity = myLoad$intensity, pd = myLoad$pd, loadFile = FALSE, batchCorrect = TRUE,
   #           file = "intensity.txt", resultsDir = paste(getwd(), "resultsChamp", sep = "/"),
   #           sampleCNA=TRUE, plotSample=TRUE, filterXY = TRUE, groupFreqPlots=TRUE,freqThreshold=0.3,
@@ -58,3 +57,30 @@ setwd("/media/NAS3_volume2/shg047/methage/twin/idat")
 Rlt<-DMR.CHAMP()
 image=paste(colnames(R)[i],"image.RData",sep=".")
 save.image(file=image)
+
+##
+
+drug=read.table("case1.txt",head=T,row.names=1,fill=T,sep="\t")
+saminfo=read.table("SampleSheet2016.txt",head=T,fill=T,sep=",",skip=7,as.is=T)
+sam2=read.table("Saminfo2.txt",head=T,fill=T,sep="\t")
+saminfonew=saminfo[match(sam2[,1],saminfo[,1]),]
+saminfonew=data.frame(saminfonew,sam2)
+
+R<-apply(drug,1,function(x) which(x=="R"))
+S<-data.frame(apply(drug,1,function(x) which(x=="S")))
+
+for(i in 1:ncol(R)){
+  system("rm *csv")
+  Res<-match(colnames(drug)[c(R[1,i],R[2,i])],as.character(saminfonew[,ncol(saminfonew)]))
+  Sen<-match(colnames(drug)[c(S[1,i],S[2,i])],as.character(saminfonew[,ncol(saminfonew)]))
+  saminfonew[Res,3]<-"R"
+  saminfonew[Sen,3]<-"S"
+  ResSam<-saminfonew[Res,]
+  SenSam<-saminfonew[Sen,]
+  output=rbind(ResSam,SenSam)
+  outputFile<-paste(colnames(R)[i],"samplesheet.csv",sep=".")
+  write.table(output,file=outputFile,col.names=T,row.names=F,sep=",",quote=F)
+  Rlt<-DMR.CHAMP()
+  image=paste(colnames(R)[i],"image.RData",sep=".")
+  save.image(file=image)
+}
