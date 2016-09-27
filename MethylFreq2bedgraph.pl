@@ -1,5 +1,5 @@
 # This script could transfer the MethylFreq files from Dinh to bedgraph files so that I can upload them to UCSC. 
-
+# Sep 27 2016
 #!/usr/bin/perl -w
 
 use strict;
