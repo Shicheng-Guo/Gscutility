@@ -1,5 +1,6 @@
 # use latest champ in lastest R version. 
 # July 8th 2016
+# This is especially for multiple comparison since the script will creat multiple csv samplesheet and then do the DMR analysis.
 
 DMR.CHAMP<-function(){
   library("ChAMP")
