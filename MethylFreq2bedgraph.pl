@@ -12,7 +12,7 @@ print "USAGE: perl $0 MethylFreq 5 > prefix.bedgraph\n";
 
 $minDepth = 5 if(!$minDepth);
 
-print "track type=bedgraph name=\"$sampleID\" visibility=full color=20,150,20 altColor=150,20,20 windowingFunction=mean\n";
+print "track type=bedGraph name=\"$sampleID\" visibility=full color=20,150,20 altColor=150,20,20 windowingFunction=mean\n";
 
 my %methylTable;
 sub main(){
