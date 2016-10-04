@@ -303,7 +303,7 @@ TSNEAnalysis<-function(mydata,phen,prefix="TSNE"){
   colnames(tsne_iris)<-c("xtsne","ytsne")
   output=paste(prefix,".tsne-2.pdf",sep="")
   pdf(output)
-  chart = ggplot(data.frame(tsne_iris), aes(xtsne,ytsne))+geom_point(size=1,alpha=1,aes(colour = factor(phen1)))+ggtitle("tSNE dimensions colored by digit")
+  chart = ggplot(data.frame(tsne_iris), aes(xtsne,ytsne))+geom_point(size=1,alpha=1,aes(colour = factor(phen)))+ggtitle("tSNE dimensions colored by digit")
   # change the size and alpha could make great beautful figure
   chart
   dev.off()
