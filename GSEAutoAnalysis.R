@@ -166,7 +166,7 @@ BMIQ <-function(beta.v,design.v,nL=3,doH=TRUE,nfit=50000,th1.v=c(0.2,0.75),th2.v
     for(l in 1:nL){
       tmpB.v <- c(tmpB.v,rbeta(tmpL.v[l],em1.o$a[l,1],em1.o$b[l,1]));
     }
-    pdf(paste("Type1fit-",sampleID,".pdf",sep=""),width=6,height=4);
+    pdf(paste(sampleID,".Type1fit",".pdf",sep=""),width=6,height=4);
     plot(density(beta1.v));
     d.o <- density(tmpB.v);
     points(d.o$x,d.o$y,col="green",type="l")
@@ -208,7 +208,7 @@ BMIQ <-function(beta.v,design.v,nL=3,doH=TRUE,nfit=50000,th1.v=c(0.2,0.75),th2.v
     for(lt in 1:nL){
       tmpB.v <- c(tmpB.v,rbeta(tmpL.v[lt],em2.o$a[lt,1],em2.o$b[lt,1]));
     }
-    pdf(paste("Type2fit-",sampleID,".pdf",sep=""),width=6,height=4);
+    pdf(paste(sampleID,".Type2fit",".pdf",sep=""),width=6,height=4);
     plot(density(beta2.v));
     d.o <- density(tmpB.v);
     points(d.o$x,d.o$y,col="green",type="l")
@@ -279,7 +279,7 @@ BMIQ <-function(beta.v,design.v,nL=3,doH=TRUE,nfit=50000,th1.v=c(0.2,0.75),th2.v
     d2.o <- density(beta2.v);
     d2n.o <- density(nbeta2.v);
     ymax <- max(d2.o$y,d1.o$y,d2n.o$y);
-    pdf(paste("CheckBMIQ-",sampleID,".pdf",sep=""),width=6,height=4)
+    pdf(paste(sampleID,"CheckBMIQ",".pdf",sep=""),width=6,height=4)
     plot(density(beta2.v),type="l",ylim=c(0,ymax),xlim=c(0,1));
     points(d1.o$x,d1.o$y,col="red",type="l");
     points(d2n.o$x,d2n.o$y,col="blue",type="l");
@@ -442,10 +442,12 @@ MDSPlot(t(NewBetaBMIQ$nbeta),phen=phen3,prefix=prefix)
 prefix=paste(GSEID,"mds.phen4",sep=".")
 MDSPlot(t(NewBetaBMIQ$nbeta),phen=phen4,prefix=prefix)
 
+############################################################################
+################## Differential Analysis ###################################
+############################################################################
 
 
-
-
-
-
+############################################################################
+######################## CCA Analysis ######################################
+############################################################################
 
