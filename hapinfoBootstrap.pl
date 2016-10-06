@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# USAGE: perl hapinfoBootstrap.pl 100000 SRX080192.hapInfo.txt
+
 use strict;
 
 my $total_haps = 0;
