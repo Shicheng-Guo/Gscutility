@@ -6,6 +6,16 @@
 # Version 1.3
 # Update: 2016-12-19
 
+# Following R script to make boxplot to check the variation
+# mitometh<-read.table("C:\\Users\\shicheng\\Downloads\\CHR.Methylation.txt",head=T,row.names=1,as.is=T)
+# colnames(mitometh)<-unlist(lapply(colnames(mitometh),function(x) substr(x,1,6)))
+# rownames(mitometh)<-lapply(rownames(mitometh),function(x) unlist(strsplit(x,"[:-]"))[2])
+# boxplot(t(mitometh),outline = F,horizontal = T)
+# par(las=2,cex=0.6,mar=c(6,6,1,4))
+# boxplot(t(mitometh),outline = T,horizontal = T)
+# par(las=2,cex=0.6,mar=c(6,6,1,4))
+# boxplot((mitometh),outline = T,horizontal = T)
+
 use strict;
 use Cwd;
 my $dir=getcwd;
