@@ -8,22 +8,19 @@
 use strict;
 use Cwd;
 my $dir=getcwd;
-die "Usage: perl $0 <submit|nosubmit>"; 
+die "Usage: perl $0 <submit|nosubmit>" if scalar(@ARGV)<1;
 my $project="SRA2Fastq";
 my $analysis="";
 my $ppn=1;
 my $walltime="168:00:00";
-my $queue="hotel"; 
+my $queue="hotel";
 my $submit=shift @ARGV;
 
 my @SRA=glob("*sra");
 foreach my $SRA(@SRA){
-    next if /SRRID/;
-    next if /^\s+$/;
     my $id=$SRA;
-    
     print "$id\n";
-    my $job_file_name = $id . ".fastq.download.job";
+    my $job_file_name = $id . ".sra2fastq.job";
     my $status_file = $id.".status";
     my $curr_dir = $dir;
     open(OUT, ">$job_file_name") || die("Error in opening file $job_file_name.\n");
@@ -39,7 +36,7 @@ foreach my $SRA(@SRA){
     print OUT "#PBS -m abe\n";
     print OUT "#PBS -A k4zhang-group\n";
     print OUT "cd $curr_dir\n";
-    print OUT "fastq-dump --split-files --gzip $id\n";    
+    print OUT "fastq-dump --split-files --gzip $id\n";
     close(OUT);
     if($submit eq 'submit'){
     system("qsub $job_file_name");
