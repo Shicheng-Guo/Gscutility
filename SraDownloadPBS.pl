@@ -15,8 +15,8 @@ my $submit=shift @ARGV;
 my $project="Fastq";
 my $analysis="";
 my $ppn=1;
-my $walltime="7:00:00";
-my $queue="home-k4zhang"; # hotel
+my $walltime="168:00:00";
+my $queue="hotel"; # hotel
 
 open F,$sraFiles;
 while(<F>){
