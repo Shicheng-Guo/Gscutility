@@ -31,7 +31,7 @@ foreach my $file(@file){
 }
 
 sub USAGE{
-print "\nUSAGE: perl $0  submit\n";
+print "\nUSAGE: perl $0 submit\n";
 print '
 --------------------------------------------------------------------------------------------------------------
 This command will index for sorted bam files under PBS system. 
