@@ -9,6 +9,7 @@ use strict;
 use warnings;
 use Cwd;
 
+my $submit=shift @ARGV;
 my $dir=getcwd;
 chdir $dir;
 my @file=glob("*.fastq");
@@ -40,6 +41,8 @@ print OUT "bismark --bowtie2 $phred-quals --fastq -L 20 -N 1 /home/shg047/db/hg1
 print OUT "samtools sort ../bam/$sample\_trimmed.fq_bismark_bt2.bam -o ../sortbam/$sample\_trimmed.fq_bismark_bt2.sort.bam\n";
 print OUT "samtools index ../sortbam/$sample\_trimmed.fq_bismark_bt2.sort.bam\n";
 print OUT "bismark_methylation_extractor --single-end --bedGraph --ignore 3 --buffer_size 4G --zero_based --comprehensive --output ../methyfreq  ../bam/$sample\_trimmed.fq_bismark_bt2.bam";
+if ($submit == "submit"){
 system("qsub $file.bismark.pbs");
+}
 }
 
