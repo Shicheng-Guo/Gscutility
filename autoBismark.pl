@@ -25,7 +25,7 @@ print OUT "#PBS -l walltime=168:00:00\n";
 print OUT "#PBS -o ".$sample.".log\n";
 print OUT "#PBS -e ".$sample.".err\n";
 print OUT "#PBS -V\n";
-print OUT "#PBS -M shihcheng.guo\@gmail.com \n";
+print OUT "#PBS -M shicheng.guo\@gmail.com \n";
 print OUT "#PBS -m abe\n";
 print OUT "#PBS -A k4zhang-group\n";
 print OUT "cd $dir\n";
