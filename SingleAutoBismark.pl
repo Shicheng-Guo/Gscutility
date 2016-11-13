@@ -12,7 +12,7 @@ use Cwd;
 my $submit=shift @ARGV;
 my $dir=getcwd;
 chdir $dir;
-my @file=glob("*.fastq");
+my @file=glob("*.fastq.gz");
 foreach my $file(@file){
 my ($sample,undef)=split /\.fastq/,$file;
 open OUT,">$file.bismark.pbs";
@@ -27,7 +27,7 @@ mkdir "../sortbam" if ! -e "../sortbam";
 $phred="--phred$phred";
 print OUT "#!/bin/csh\n";
 print OUT "#PBS -q hotel\n";
-print OUT "#PBS -l nodes=1:ppn=1\n";
+print OUT "#PBS -l nodes=1:ppn=2\n";
 print OUT "#PBS -l walltime=168:00:00\n";
 print OUT "#PBS -o ".$sample.".log\n";
 print OUT "#PBS -e ".$sample.".err\n";
@@ -41,8 +41,7 @@ print OUT "bismark --bowtie2 $phred-quals --fastq -L 20 -N 1 /home/shg047/db/hg1
 print OUT "samtools sort ../bam/$sample\_trimmed.fq_bismark_bt2.bam -o ../sortbam/$sample\_trimmed.fq_bismark_bt2.sort.bam\n";
 print OUT "samtools index ../sortbam/$sample\_trimmed.fq_bismark_bt2.sort.bam\n";
 print OUT "bismark_methylation_extractor --single-end --bedGraph --ignore 3 --buffer_size 4G --zero_based --comprehensive --output ../methyfreq  ../bam/$sample\_trimmed.fq_bismark_bt2.bam";
-if ($submit == "submit"){
-system("qsub $file.bismark.pbs");
+if ($submit eq "submit"){
+system("echo $file.bismark.pbs");
 }
 }
-
