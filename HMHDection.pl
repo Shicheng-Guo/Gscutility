@@ -1,13 +1,11 @@
 #!/usr/bin/perl -w
 use strict;
 use Cwd;
-# Extract Pileup within specfic genomic regions (CDS, Exon)
-# Set Pileup and GenomicInterval regions
+# Filter out cancer-associated haplotype without existed in normal plasma and normal tissues
 # Contact: Shicheng Guo
 # Version 1.3
-# Update: 2016-03-16
+# Update: 2016-11-22
 
-chdir "C:\\Users\\shicheng\\Dropbox\\Project\\methylation\\monod\\analysis\\May52016-methHaplot";
 my %sam;
 my %hapinfo;
 my %loc;
@@ -25,12 +23,20 @@ my $out=shift @ARGV;
 # my $cp="test2.txt";
 # my $out="rlt1.txt";
 
-
 my ($ct_sam,undef)=split/\./,$ct;  # Should be keep consistent with Line 26: my ($sam,undef)=split/\./,$file;
 my ($cp_sam,undef)=split/\./,$cp;  # Should be keep consistent with Line 26: my ($sam,undef)=split/\./,$file;
 
-my @file=glob("*.hapInfo.txt");
-
+# my @file=glob("*.hapInfo.txt");
+open F2,$excl;
+my @file;
+push (@file,$ct);
+push (@file,$cp);
+while(<F2>){
+	chomp;
+	my($exclFile,undef)=split/\s+/; 
+	push (@file,$exclFile);
+}
+	
 foreach my $file(@file){
 	my ($sam,undef)=split/\./,$file;
 	open F,$file;
@@ -39,7 +45,7 @@ foreach my $file(@file){
     next if /^\s+$/;
 	my ($loc,$haptype,$count,$cpg)=split /\s+/;
 	my $C_number = () = $haptype =~ /C/gi;		
-		if($C_number>=2){                             # Criteron of HMH(High methylation Haplotype), Here at least two methylated C in the haplotype
+		if($C_number>=2){   # Criteron of HMH(High methylation Haplotype), Here at least two methylated C in the haplotype
 		print "$sam\t$_\n";		
 		$hapinfo{$loc}{$cpg}{$haptype}{$sam}=$count;
 		$loc{$loc}=$loc;
@@ -52,7 +58,8 @@ foreach my $file(@file){
 
 open OUT,">$out.txt";
 foreach my $loc(sort keys %hapinfo){
-	my %Hapinfo;   # reformed hapinfo(hapsplit and hapmerge)
+	# reformed hapinfo(hapsplit and hapmerge, from 1,i,i+1,n)
+	my %Hapinfo;   
 	foreach my $cpg(sort keys %{$hapinfo{$loc}}){
 	foreach my $hap(sort keys %{$hapinfo{$loc}{$cpg}}){
 		my @cpg=split/,/,$cpg;
@@ -62,16 +69,13 @@ foreach my $loc(sort keys %hapinfo){
 			while($j<=$#cpg-$i+1){
 			my $string_hap=substr($hap,$i,$j);
 			my $string_cpg=join(",",@cpg[$i..($i+$j-1)]);
-			print "$string_hap\t$string_cpg";
 			foreach my $sam(sort keys %sam){
 			if($hapinfo{$loc}{$cpg}{$hap}{$sam}){
 			$Hapinfo{$loc}{$cpg}{$hap}{$sam}+=$hapinfo{$loc}{$cpg}{$hap}{$sam};
 			}
 			}
 			$j++;
-			print "\n";
 			}
-			print "\n";
 			$i++;				
 		}	
 	}
@@ -79,12 +83,12 @@ foreach my $loc(sort keys %hapinfo){
 	
 	my @sam=sort keys %sam;
 	my $header=join("\t",@sam);
-	print OUT "LOC\tCpG\tHapType\t$header\n";
+	# print OUT "LOC\tCpG\tHapType\t$header\n";
 	foreach my $loc(sort keys %Hapinfo){
 	foreach my $cpg(sort keys %{$Hapinfo{$loc}}){
 	foreach my $hap(sort keys %{$Hapinfo{$loc}{$cpg}}){
 		next if(! exists $Hapinfo{$loc}{$cpg}{$hap}{$ct_sam} || ! exists $Hapinfo{$loc}{$cpg}{$hap}{$cp_sam} || $Hapinfo{$loc}{$cpg}{$hap}{$ct_sam}<=1 || $Hapinfo{$loc}{$cpg}{$hap}{$cp_sam}<=1);  # Criteron of Minimum HMH in the Target Samples.
-		print OUT "$loc\t$cpg\t$hap\t";	
+		print OUT "$loc\t$cpg\t$hap\t$ct\t$cp";	
 		foreach my $sam(sort keys %sam){
 		if(! exists  $Hapinfo{$loc}{$cpg}{$hap}{$sam}){
 		print OUT "\t0";		
@@ -101,7 +105,9 @@ foreach my $loc(sort keys %hapinfo){
 
 sub USAGE{
 print "Usage: perl $0 M-Primary-Hapinfo M-Plasma-Hapinfo ExcludeDataBase-Hapinfo OutputFileName\n";
-print "Identify the Potential Confounder of the Source Cancer Specific Methylation Haplotype\n";
+print "Status Screening for (Shared HMH:High Methylation Haplotype by Tissue and Plam) in Other Tissues\n";
+print "Move All Hapinfo Files into One Folder and assign Matched Tissue and Plasma\n";
+
 
 print '
 Format For: M-Primary-Hapinfo and M-Plasma-Hapinfo: 
