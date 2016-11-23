@@ -23,6 +23,7 @@ my $out=shift @ARGV;
 # my $cp="test2.txt";
 # my $out="rlt1.txt";
 
+
 my ($ct_sam,undef)=split/\./,$ct;  # Should be keep consistent with Line 26: my ($sam,undef)=split/\./,$file;
 my ($cp_sam,undef)=split/\./,$cp;  # Should be keep consistent with Line 26: my ($sam,undef)=split/\./,$file;
 
@@ -46,7 +47,6 @@ foreach my $file(@file){
 	my ($loc,$haptype,$count,$cpg)=split /\s+/;
 	my $C_number = () = $haptype =~ /C/gi;		
 		if($C_number>=2){   # Criteron of HMH(High methylation Haplotype), Here at least two methylated C in the haplotype
-		print "$sam\t$_\n";		
 		$hapinfo{$loc}{$cpg}{$haptype}{$sam}=$count;
 		$loc{$loc}=$loc;
 		$cpg{$cpg}=$cpg;
@@ -57,6 +57,9 @@ foreach my $file(@file){
 }
 
 open OUT,">$out.txt";
+my @sam=sort keys %sam;
+my $header=join("\t",@sam);
+print OUT "LOC\tCpG\tHapType\tT1\tT2\t$header\n";
 foreach my $loc(sort keys %hapinfo){
 	# reformed hapinfo(hapsplit and hapmerge, from 1,i,i+1,n)
 	my %Hapinfo;   
@@ -81,9 +84,7 @@ foreach my $loc(sort keys %hapinfo){
 	}
 	}
 	
-	my @sam=sort keys %sam;
-	my $header=join("\t",@sam);
-	# print OUT "LOC\tCpG\tHapType\t$header\n";
+
 	foreach my $loc(sort keys %Hapinfo){
 	foreach my $cpg(sort keys %{$Hapinfo{$loc}}){
 	foreach my $hap(sort keys %{$Hapinfo{$loc}{$cpg}}){
