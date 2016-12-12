@@ -6,6 +6,8 @@ the $hgsid should be the same as the local webbrowser
 
 Can only be run in desktop since you need input hgsid manually from internet explorer. 
 This hgsid is located in the end of the UCSC browser after "hgsid="
+input format： 
+APC   chr2   2003485487  2003485687  cg564845541
 =cut
 
 use strict;
