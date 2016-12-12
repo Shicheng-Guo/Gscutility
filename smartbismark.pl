@@ -69,10 +69,10 @@ while(<F>){
     }
     
     my $nodes=1;
-    my $ppn=8;
-    my $multicore=2;
+    my $ppn=8;          
+    my $multicore=3;    # the more the better to avoid exceed the queue walltime limit
     my $curr_dir = $dir;
-    my $queue="hotel"; # hotel,pdafm,condo
+    my $queue="hotel";  # hotel,pdafm,condo
     my %walltime=(
     "hotel" => "168:00:00",
     "condo" => "8:00:00",
@@ -124,7 +124,6 @@ while(<F>){
     print OUT "#PBS -M shihcheng.guo\@gmail.com \n";
     print OUT "#PBS -m abe\n";
     print OUT "#PBS -A k4zhang-group\n";
-    
 	print OUT "# fastq-dump --split-files --gzip $sample\n";
 	print OUT "trim_galore --phred$phred --fastqc --illumina $sample1.fastq.gz --output_dir ../fastq_trim\n";
     print OUT "bismark --bowtie2 --phred$phred-quals --fastq -L 32 -N 1 --multicore 2 $BismarkRefereDb ../fastq_trim/$sample1\_trimmed.fq.gz -o ../bam\n";  
