@@ -1,5 +1,5 @@
 #!/usr/bin/R
-# Downsampling data by the index (Group ID, Cell type) at defined propotion
+# Downsampling data by the index (Group ID, Cell type) at defined number
 # for Dr. Blue Lake
 # Data: 12/19/2016
 
