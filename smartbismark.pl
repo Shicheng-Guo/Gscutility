@@ -4,7 +4,7 @@
 # Good habit to creat parameter table for a project
 # Contact: Shicheng Guo
 # Version 1.3
-# Update: 12/17/2016
+# Update: 12/18/2016
 
 use strict;
 use Cwd;
