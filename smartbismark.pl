@@ -112,7 +112,7 @@ sub process_command_line{
 	                              "queue=s"   					=> \$queue,                                                                    
                                   "help"      					=> \$help,
 	                              "submit=s"   					=> \$submit,
-	                              "BismarkRefereDb=s" 			=> \$$BismarkRefereDb,
+	                              "BismarkRefereDb=s" 			=> \$BismarkRefereDb,
 	                             );
 	
     unless (defined $genome){
@@ -158,31 +158,39 @@ sub process_command_line{
     #################################################################################################
     ##################### Assemble PBS Paramters (nodes, ppn, walltime multicore) ##########################
     #################################################################################################
-    
+    warn "\n\nYou didn't assign Queue for the script, the default setting: multicore=2 and ppn=6 will be applied!\n\n" if ! defined $queue; 
+	$queue="default" if ! defined $queue;
+	
     %walltime=(
-    "hotel" => "168:00:00",
-    "condo" => "8:00:00",
-    "pdafm" => "72:00:00",
-    "glean" => "72:00:00",
+    hotel   => "168:00:00",
+    condo   => "8:00:00",
+    pdafm   => "72:00:00",
+    glean   => "72:00:00",
+    default => "168:00:00",
+
     );
     %ppn=(
-    hotel => "16",
-    pdafm => "32",
-    glean => "16",
-    condo => "16",
+    hotel   => "16",
+    pdafm   => "32",
+    glean   => "16",
+    condo   => "16",
+    default => "6",
     );
     %multicore=(
-    hotel => "6",
-    pdafm => "12",
-    glean => "6",
-    condo => "6",
+    hotel   => "6",
+    pdafm   => "12",
+    glean   => "6",
+    condo   => "6",
+    default => "2",
     );
-    warn "Queue: $queue is not found in this server, please check the queue name\n" if ! defined $ppn{$queue}; 
 
+    warn "Queue: $queue is not found in this server, please check the queue name\n" if ! defined $ppn{$queue}; 
+     
     $nodes=1;
     $ppn=$ppn{$queue};
     $walltime=$walltime{$queue};
     $multicore=$multicore{$queue};
+	
     
     #################################################################################################
     ##################### Return All the paramters for SmartBismark ##########################
@@ -240,12 +248,15 @@ VERSION
 
 sub directory_build{
 chdir getcwd;
-mkdir "../fastq_trim" if ! -e "../fastq_trim" || die "cannot build directory: fastq_trim\n";
-mkdir "../bam" if ! -e "../bam"               || die "cannot build directory: bam\n";
-mkdir "../bedgraph" if ! -e "../bedgraph"     || die "cannot build directory: bedgraph\n";
-mkdir "../sortbam" if ! -e "../sortbam"       || die "cannot build directory: sortbam\n";
-mkdir "../methyfreq" if ! -e "../methyfreq"   || die "cannot build directory: methyfreq\n";
+mkdir "../fastq_trim" if ! -e "../fastq_trim" || print  "fastq_trim    Building Succeed!  <Trimed Fastq>    will be stored here\n";
+mkdir "../bam" if ! -e "../bam"               || print  "bam           Building Succeed!    <Bam Files>     will be stored here\n";
+mkdir "../bedgraph" if ! -e "../bedgraph"     || print  "bedgraph      Building Succeed!  <Bedgraph Files>  will be stored here\n";
+mkdir "../sortbam" if ! -e "../sortbam"       || print  "sortbam       Building Succeed!  <SortBam Files>   will be stored here\n";
+mkdir "../methyfreq" if ! -e "../methyfreq"   || print  "methyfreq     Building Succeed!  <MethyFreq Files> will be stored here\n\n";
+mkdir "../bedgraph" if ! -e "../bedgraph"     || print  "bedgraph      Building Succeed!  <BedGraph Files>  will be stored here\n\n";
+mkdir "../bw" if ! -e "../bw"                 || print  "bigwig        Building Succeed!  <BigWig Files>    will be stored here\n\n";
 }
+
 
 
 sub bismark_version{
