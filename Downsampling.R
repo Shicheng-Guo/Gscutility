@@ -1,6 +1,6 @@
 #!/usr/bin/R
 # Downsampling data by the index (Group ID, Cell type) at defined propotion
-# for Dr. blue lake
+# for Dr. Blue Lake
 # Data: 12/19/2016
 
 # raw data simulation
