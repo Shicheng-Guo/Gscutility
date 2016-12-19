@@ -5,7 +5,7 @@ my $fa=shift @ARGV;
 open F,$fa;
 my $seq;
 my($chr,undef)=split/.fa/,$fa;
-my $out="$chr.cg.pos";
+my $out="$chr.CpG.positions.txt";
 open F,$fa;
 while(<F>){
 next if />/;
@@ -22,7 +22,7 @@ sub match_positions {
 sub all_match_positions {
     my ($regex, $string) = @_;
     my @ret;
-    while ($string =~ /($regex)/g) {
+    while ($string =~ /($regex)/ig) {
         push @ret, [(pos($string)-length $1),pos($string)-1];
     }
     return @ret
