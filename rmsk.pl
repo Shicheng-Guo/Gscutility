@@ -30,9 +30,9 @@ my ($help,$version,$input,$output)=options();
 open F,$input;
 open OUT,">$output";
 while(<F>){
-next if /repClass/;
 chomp;
-my @line=split/\s/;
+next if /repClass/;
+my @line=split/\s+/;
 my $chr=$line[5];
 my $start=$line[6];
 my $end=$line[7];
