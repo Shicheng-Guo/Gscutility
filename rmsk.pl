@@ -30,6 +30,7 @@ my ($help,$version,$input,$output)=options();
 open F,$input;
 open OUT,">$output";
 while(<F>){
+next if /repClass/;
 chomp;
 my @line=split/\s/;
 my $chr=$line[5];
@@ -39,7 +40,6 @@ my $id="$line[5]:$line[6]-$line[7]";
 my $chain=$line[9];
 my $type=$line[10];
 my $group=$line[11];
-print OUT "$chr\t$start\t$end\t$id\t$group";
+print OUT "$chr\t$start\t$end\t$id\t$group\n";
 }
-
 
