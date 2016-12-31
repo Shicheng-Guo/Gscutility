@@ -20,7 +20,7 @@ use strict;
 use Cwd;
 my $dir=getcwd;
 chdir $dir;
-my @file=glob("*bigWig.tab");
+my @file=glob("*.tab");
 
 my %mf;
 my %pos;
@@ -29,31 +29,37 @@ foreach my $sam(@file){
 $sam{$sam}=$sam;
 open F,$sam;
 while(<F>){
-	chomp;
-	my @line=split /\t/;
-	my $region=$line[0];
-    $pos{$region}=$region;
-    $mf{$region}{$sam}=$line[$#line];
-	}	
+        my $mf;
+        chomp;
+        my @line=split /\t/;
+        my $region=$line[0];
+        $pos{$region}=$region;
+        if($line[2]>=1){
+        $mf=$line[$#line];
+        }else{
+        $mf="NA";
+        }
+        $mf{$region}{$sam}=$mf;
+        }
 }
 
 ######## Print Matrix-header
 my @sam;
 foreach my $sam(sort keys %sam){
-	push(@sam,$sam);
+        push(@sam,$sam);
 }
 my $head=join("\t",@sam);
 print "\t$head\n";
 
 foreach my $pos(sort keys %mf){
- 	print "$pos";
- 	foreach my $sam (sort keys %sam){
- 	if( ! exists $mf{$pos}{$sam}||! defined $mf{$pos}{$sam}||$mf{$pos}{$sam}=~/NA/){
- 	print "\tNA";			
- 	}else{
- 	my $R2=sprintf("%.3f",$mf{$pos}{$sam});
- 	print "\t$R2";
- 	}	
- 	}
- 	print "\n";
+        print "$pos";
+        foreach my $sam (sort keys %sam){
+        if( ! exists $mf{$pos}{$sam}||! defined $mf{$pos}{$sam}||$mf{$pos}{$sam}=~/NA/){
+        print "\tNA";
+        }else{
+        my $R2=sprintf("%.3f",$mf{$pos}{$sam});
+        print "\t$R2";
+        }
+        }
+        print "\n";
 }
