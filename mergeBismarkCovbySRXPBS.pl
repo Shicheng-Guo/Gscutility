@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# A perl script to merge bismark cov file by SRX list.
+# A perl script to creat PBS jobs for merging bismark cov file by SRX list.
 # Contact: Shihcheng.Guo@Gmail.com
 # Version 1.3
 # Go to http://sra.dnanexus.com/studies/SRP028600/samples
@@ -17,13 +17,13 @@ open F,$file;
 while(<F>){
 chomp;
 if(/(SRR\d+)/){
-	my $SRR=$1;
-	if(/(SRX\d+)/){
-		my $SRX=$1;
-		print "$SRR\t$SRX\n";
-		push @{$SRA{$SRX}},$SRR;
-		}
-	}
+        my $SRR=$1;
+        if(/(SRX\d+)/){
+                my $SRX=$1;
+                print "$SRR\t$SRX\n";
+                push @{$SRA{$SRX}},$SRR;
+                }
+        }
 }
 
 my @cov=glob("*.cov");
@@ -32,15 +32,18 @@ my %mf;
 
 foreach my $SRX(sort keys %SRA){
         foreach my $SRR (@{$SRA{$SRX}}){
-        	foreach my $cov(@cov){
-        		if($cov=~/$SRR/){
-        			system("cat $cov >> $SRX.bedgraph");
-        			print "$SRX combinding completed!\n";
-        		}
-        	}
+                foreach my $cov(@cov){
+                        if($cov=~/$SRR/){
+                                system("cat $cov >> $SRX.bedgraph");
+                                print "$SRR reading completed!\n";
+                        }
+                }
         }
-    open OUT, ">$SRX.pbs";
-	print OUT "#!/bin/csh\n";
+}
+
+foreach my $SRX(sort keys %SRA){
+        open OUT, ">$SRX.pbs";
+        print OUT "#!/bin/csh\n";
     print OUT "#PBS -N $SRX\n";
     print OUT "#PBS -q hotel\n";
     print OUT "#PBS -l nodes=1:ppn=1\n";
@@ -52,7 +55,6 @@ foreach my $SRX(sort keys %SRA){
     print OUT "#PBS -m abe\n";
     print OUT "#PBS -A k4zhang-group\n";
     print OUT "cd \$PBS_O_WORKDIR\n";
-    print OUT "perl ~/bin/bedgraphUnique.pl $SRX.bedgraph\n";        
-        
+    print OUT "perl ~/bin/bedgraphUnique.pl > $SRX.bedgraph\n";
+    system("qsub $SRX.pbs");
 }
-
