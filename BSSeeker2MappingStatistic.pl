@@ -1,5 +1,4 @@
 #!/usr/bin/perl -w
-
 # BSSeeker2MappingStastic.pl: a perl script to collect the mapping information from BSSeeker2.
 # Run the script to the Bam directory of the bismark
 # Contact: Shicheng Guo
