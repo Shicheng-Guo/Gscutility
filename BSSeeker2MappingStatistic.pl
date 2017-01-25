@@ -3,6 +3,7 @@
 # Run the script to the Bam directory of the bismark
 # Contact: Shicheng Guo
 # Version 1.3
+# 
 
 use strict;
 use warnings;
