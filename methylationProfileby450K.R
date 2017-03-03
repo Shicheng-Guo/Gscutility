@@ -1,4 +1,4 @@
-setwd("/media//puweilin/æ°å å·/Gengxin/")
+setwd("/home")
 anno=read.csv("GPL13534_HumanMethylation450_15017482_v.1.1.csv",header=T,sep="\t")
 
 #data preparation
