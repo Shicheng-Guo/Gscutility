@@ -2,7 +2,7 @@ setwd("/home")
 anno=read.csv("GPL13534_HumanMethylation450_15017482_v.1.1.csv",header=T,sep="\t")
 
 #data preparation
-setwd("/media//puweilin/æ°å å·/Gengxin/LUAD/")
+setwd("/LUAD/")
 load("LUAD_CDH13.RData")
 LUAD_CDH13=LUAD_CDH13[,which(LUAD_CDH13[4,] %in% c("01","11"))]
 type=LUAD_CDH13[4,]
