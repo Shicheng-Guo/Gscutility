@@ -74,6 +74,7 @@ open OUT1,">$output.cctf";
 open OUT2,">$output.homf";
 open OUT3,">$output.region.cctf";
 open OUT4,">$output.region.homf";
+
 my @sam=sort keys %sam;
 my $header=join("\t",@sam);
 # print OUT1 "GenomeInterval\tCpGLocList\t$header\n";
@@ -82,6 +83,7 @@ print OUT1 "Chr\tStart\tEnd\t$header\n";
 print OUT2 "Chr\tStart\tEnd\t$header\n";
 print OUT3 "Chr\tStart\tEnd\t$header\n";
 print OUT4 "Chr\tStart\tEnd\t$header\n";
+
 
 print "Start to Performance Haplotype Split and Recombination....\n";
 
@@ -211,7 +213,32 @@ foreach my $loc(sort keys %HapinfoRegion){
 	print OUT3 "\n";
 	print OUT4 "\n";
 }
-	
+
+open OUT5,">$output.counts.cctf";
+open OUT6,">$output.counts.homf";
+print OUT5 "Chr\tStart\tEnd\t$header\n";
+print OUT6 "Chr\tStart\tEnd\t$header\n";
+
+foreach my $sam(sort keys %sam){
+	foreach my $loc(sort keys %HapinfoRegion){
+		my $C=0;
+		my $T=0;
+		my $N=0;
+		my ($chr,$start,$end)=split/[:-]/,$loc;
+		print OUT3 "$chr\t$start\t$end";
+		print OUT4 "$chr\t$start\t$end";
+		$C= defined $HapinfoRegion{$loc}{$sam}{'C'} ? $HapinfoRegion{$loc}{$sam}{'C'} : 0; 
+		$T= defined $HapinfoRegion{$loc}{$sam}{'T'} ? $HapinfoRegion{$loc}{$sam}{'T'} : 0; 
+		$N= defined $HapinfoRegion{$loc}{$sam}{'N'} ? $HapinfoRegion{$loc}{$sam}{'N'} : 0; 
+		my $ratio1=sprintf("%.2f",$C/($C+$T+0.001));
+		my $ratio2=sprintf("%.2f",1-($N)/($C+$T+$N+0.001));
+		print OUT3 "\t$ratio1";
+		print OUT4 "\t$ratio2";
+		}		
+		print OUT3 "\n";
+		print OUT4 "\n";
+}
+
 print "\n";	
 close OUT1;
 close OUT2;
