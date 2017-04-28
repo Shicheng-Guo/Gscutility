@@ -1,8 +1,21 @@
 #!/usr/bin/perl -w
 
-# Version update: April 5th 2016 
+# 2017/4/28
 
 use strict;
+use warnings;
+use Cwd;
+use Getopt::Long;
+use Pod::Usage;
+use IO::Handle;
+
+
+my $parent_dir = getcwd();
+my $methtype_version = 'v0.2.1';
+my $start_run = time();
+warn "Run started at: $start_run\n";
+my $command_line = join (" ",@ARGV);
+warn "Version update: Feb 15th 2017\n";
 
 my $samtools = "samtools";
 my $target_list_file= $ARGV[0];
@@ -11,13 +24,15 @@ my $Aligner=$ARGV[2];
 my $chrsizeFile=$ARGV[3];
 my $cpg_position_file=$ARGV[4];
 die("USAGE: mergedBam2hapInfo.pl InputBed MergeBam <bisReadMapper|bismark> ChrosmeZizeFile CpG_Position_File\n") if(scalar(@ARGV)<5);
-my $phred=33;
 
+my $phred=33;
 my $target_flanking_len = 80;
-my %targetTable;
-my %hapInfoTable;
-my %binnedtargetTable;
-my %rcTable;
+my %targetTable;                     # stores target regions          
+my %hapInfoTable;                    # stores haplotype
+my %binnedtargetTable;               # stores genomic bins, cpgs and genomic regions
+my %rcTable;                         # stores rctable
+my $verbose = 0;
+
 $rcTable{'A'}='T';
 $rcTable{'T'}='A';
 $rcTable{'G'}='C';
@@ -29,24 +44,31 @@ $rcTable{'M'}='K';
 $rcTable{'K'}='M';
 $rcTable{'S'}='S';
 $rcTable{'W'}='W';
-my ($reads_parsed, $reads_after_filtering);
+
+my $reads_parsed ;                    # counts the reads number in the bam files
+my $reads_after_filtering;            # counts the reads number used for hapinfo
 
 open F,"$chrsizeFile" || die "can not open $chrsizeFile,please make sure this file is existed!";
 my %chrSizes;
+
 while(<F>){
 chomp;
 my($chr,$len)=split/\s+/;
 $chrSizes{$chr}=$len;
 }
 
+# Step 1. Assign target region(targetTable) to genomic bins (binnedtargetTable)
 open(INFILE, "$target_list_file")||die("Error in opening $target_list_file\n");
-#forward strand
-my $bin_size = 10000;
+my $bin_size = 100000; # warn: keep your interest regions < $bin_size
 while(my $line = <INFILE>){
-	chop($line);
+	next if !/^chr/;
+	chomp($line);
         next if $line=~/^\s+$/;
-	my ($chr,$target_start,$target_end,$id) = split(/[\t ]+/, $line);
+	my ($chr,$target_start,$target_end,$id) = split(/\s+/, $line);
+	my $len=$target_end-$target_start;
+        warn "warning: $chr:$target_start-$target_end is longer than $bin_size bp, please contact Shihcheng.Guo\@gmail.com\n\n" if $len > $bin_size;
 	my $index = int($target_start/$bin_size);
+	# Debug(20161201) print "index :$index\n";
 	my $target_id = "$chr:$target_start-$target_end";
 	push(@{$binnedtargetTable{$chr}->{$index}},$target_id);
 	push(@{$binnedtargetTable{$chr}->{$index-1}},$target_id);
@@ -54,22 +76,24 @@ while(my $line = <INFILE>){
 }
 close(INFILE);
 
+# Step 2. Assign CpG loci to genomic bin (binnedtargetTable) and target region( targetTable)
 open(INFILE, "$cpg_position_file")|| die "Error in opening $cpg_position_file, Please make sure this file existed!\n";
-
 while(my $line = <INFILE>){
 	chop($line);
-	my ($chr, $pos) = split(/[\t ]+/, $line);
+	my ($chr, $pos) = split(/\s+/, $line);
 	my $index = int($pos/$bin_size);
 	next if(!$binnedtargetTable{$chr}->{$index});	
+	# Debug(20161201) print "index :$index\n";
 	foreach my $target_id (@{$binnedtargetTable{$chr}->{$index}}){
 		my ($chr,$target_start,$target_end) = split(/[:\-]/, $target_id);
 		if($target_start <= $pos && $pos <=$target_end){
-			push(@{$targetTable{$target_id}->{"CpG_positions"}},$pos);			
+		push(@{$targetTable{$target_id}->{"CpG_positions"}},$pos);	
 		}
 	}
 }
 close(INFILE);
 
+# Step 3. loop interest regions and parse CpG methylation status with samtools view. 
 if($Aligner eq 'bismark'){
 foreach my $target_id (sort keys(%targetTable)){
 	my ($chr,$target_start,$target_end) = split(/[:\-]/, $target_id);
@@ -96,6 +120,7 @@ foreach my $target_id (sort keys(%targetTable)){
 		my $CIGAR = $fields[5];
 		my $read_length = length($seq);
 		next if($CIGAR =~ /[ID]/);
+		
 		if($CIGAR=~ /S/){
 			my ($clip_len, @others) = split(/S/, $CIGAR);
 			next if(length($clip_len)>2);
@@ -117,11 +142,12 @@ foreach my $target_id (sort keys(%targetTable)){
 		#print "#$read_id\t$CIGAR\t$read_start\t$read_strand\t$seq\t$qual_string\n";		
 		foreach my $CpG_position(@CpG_positions){
 			my $offset = $CpG_position-$read_start+1;
-			next if($offset<0 || $offset >= length($seq));	
+			next if($offset<0 || $offset >= length($seq));	 # offset should not or cannot <0 or else you should change the code or data carefully.
+			# Debug: print "$CpG_position\t$read_start\t$offset\n";
             # the situation sometimes should be change dependent on Flag of different alignmentor
 			if($read_strand <16 || $read_strand ==99 ||$read_strand ==147)
             {
-                                # positive chain
+                # positive chain
 				my $qual_score = ord(substr($qual_string,$offset,1))-$phred;
 				next if($readHapInfo{$read_id}->{$CpG_position}->{"qual"} && $readHapInfo{$read_id}->{$CpG_position}->{"qual"} > $qual_score); # UMIs choose the best one
 				$readHapInfo{$read_id}->{$CpG_position}->{"base"}=substr($seq,$offset,1);
@@ -139,11 +165,13 @@ foreach my $target_id (sort keys(%targetTable)){
 		$read_start_pos_table{$read_id} = $read_start if(!$read_start_pos_table{$read_id} || $read_start_pos_table{$read_id}<$read_start);
 	}		
 	
-	#Use read start as the UMI to collapse multiple clonal reads.
+	# Use read start and read end as the UMI to collapse multiple clonal reads.
+	# How to define UMI will influence the result compared with classic methylation level(bismark)
 	my @read_list = keys(%readHapInfo);		
 	my %unique_read_base_info;
 	foreach my $read_id (@read_list){		
-		my $UMI = $read_start_pos_table{$read_id};
+		my $UMI = $read_id;                          # read_id as UMI 
+		#my $UMI = $read_start_pos_table{$read_id};  # start postion as UMI
 		foreach my $CpG_position (keys(%{$readHapInfo{$read_id}})){
 			next if(!$readHapInfo{$read_id}->{$CpG_position}->{"base"});
 			#print "$CpG_position\n";
@@ -187,6 +215,7 @@ foreach my $target_id (sort keys(%targetTable)){
 	}
 }
 }else{
+
 foreach my $target_id (sort keys(%targetTable)){
 	my ($chr,$target_start,$target_end) = split(/[:\-]/, $target_id);
 	my $region_start = $target_start-$target_flanking_len;
@@ -197,14 +226,13 @@ foreach my $target_id (sort keys(%targetTable)){
 	next if(scalar(@lines)<1 || !$targetTable{$target_id}->{"CpG_positions"});
 	$reads_parsed += scalar(@lines);
 	$reads_after_filtering += scalar(@lines);
-	my @CpG_positions = sort {$a <=> $b} @{$targetTable{$target_id}->{"CpG_positions"}};
+	my @CpG_positions = sort {$a <=> $b} @{$targetTable{$target_id}->{"CpG_positions"}};   # @CpG_positions contains all the CpGs within target_id
 	my %readHapInfo;	
 
 	#print "##$cmd\n";
 	#Going through the reads one at a time
 	my %read_start_pos_table;
 	foreach my $line (@lines){
-                #D print "$line\n";
 		my @fields = split(/\t/, $line);
 		my $read_strand = $fields[1];		
 		my $seq = $fields[9];		
@@ -213,6 +241,7 @@ foreach my $target_id (sort keys(%targetTable)){
 		my $CIGAR = $fields[5];
 		my $read_length = length($seq);
 		next if($CIGAR =~ /[ID]/);
+        
 		if($CIGAR=~ /S/){
 			my ($clip_len, @others) = split(/S/, $CIGAR);
 			next if(length($clip_len)>2);
@@ -231,11 +260,12 @@ foreach my $target_id (sort keys(%targetTable)){
 			push(@read_fields,"NA");
 		}
 		my $read_id = scalar(@read_fields)>7 ? join("-", @read_fields[0..6]) : join("-", @read_fields[0..4]);	
-		# print "#$read_id\t$CIGAR\t$read_start\t$read_strand\t$seq\t$qual_string\n";		
+		#print "#$read_id\t$CIGAR\t$read_start\t$read_strand\t$seq\t$qual_string\n";		
 		foreach my $CpG_position(@CpG_positions){
 			my $offset = $CpG_position-$read_start+1;
+			# print "$target_id\t$CpG_position\t$read_start\t$offset\n";
 			next if($offset<0 || $offset >= length($seq));	
-            # the situation sometimes should be change dependent on Flag of different alignmentor
+            # Depend on different alignmentor(bisreadmapper)
 			if($read_strand & 0x10)
             {
 				my $qual_score = ord(substr($qual_string,$offset+1,1))-$phred;
@@ -255,10 +285,13 @@ foreach my $target_id (sort keys(%targetTable)){
 	}		
 	
 	#Use read start as the UMI to collapse multiple clonal reads.
+    # How to define UMI will influence the result compared with classic methylation level(bismark)
 	my @read_list = keys(%readHapInfo);		
 	my %unique_read_base_info;
 	foreach my $read_id (@read_list){		
-		my $UMI = $read_start_pos_table{$read_id};
+		my $UMI = $read_id;                          # read_id as UMI 
+		#my $UMI = $read_start_pos_table{$read_id};  # start postion as UMI
+		
 		foreach my $CpG_position (keys(%{$readHapInfo{$read_id}})){
 			next if(!$readHapInfo{$read_id}->{$CpG_position}->{"base"});
 			#print "$CpG_position\n";
@@ -302,4 +335,18 @@ foreach my $target_id (sort keys(%targetTable)){
 	}
 }
 }
+
+
+   ### Produce Run Time
+   my $end_run = time();
+   my $run_time = $end_run - $start_run;
+   my $days  = int($run_time/(24*60*60));
+   my $hours = ($run_time/(60*60))%24;
+   my $mins  = ($run_time/60)%60;
+   my $secs  = $run_time%60;
+   warn "\nMethtype completed in ${days}d ${hours}h ${mins}m ${secs}s\n";
+
+
+
+	
 	
