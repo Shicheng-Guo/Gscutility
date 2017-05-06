@@ -11,13 +11,23 @@ use strict;
 use warnings;
 use Cwd;
 
+use strict;
+use warnings;
+use Cwd;
+
 my $file=shift @ARGV;
 my %SRA;
 open F,$file;
 while(<F>){
 chomp;
-my ($SRR,$SRP,$SRX,$SRS)=split /\t/;
-push @{$SRA{$SRS}},$SRR;
+if(/(SRR\d+)/){
+	my $SRR=$1;
+	if(/(SRX\d+)/){
+		my $SRX=$1;
+		print "$SRR\t$SRX\n";
+		push @{$SRA{$SRX}},$SRR;
+		}
+	}
 }
 
 foreach my $SRS(sort keys %SRA){
