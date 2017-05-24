@@ -30,7 +30,7 @@ system("rm ../mergeHapinfo/*hapinfo.txt");
 
 foreach my $SRX(sort keys %SRA){
         foreach my $SRR (@{$SRA{$SRX}}){
-        system("cat $SRR*sort.bam.hapInfo.txt >> ../mergeHapinfo/$SRX.hapinfo.txt");
+        system("cat $SRR*.hapInfo.txt >> ../mergeHapinfo/$SRX.hapinfo.txt");
         }
         print "\n";
 }
