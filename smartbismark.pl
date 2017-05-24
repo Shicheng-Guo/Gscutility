@@ -4,7 +4,7 @@
 # Good habit to creat parameter table for a project
 # Contact: Shicheng Guo
 # Version 1.3
-# Update: 12/17/2016
+# Update: 05/24/2017
 
 use strict;
 use Cwd;
@@ -295,7 +295,7 @@ mkdir "../methyfreq" if ! -e "../methyfreq"   || print  "methyfreq      Building
 mkdir "../bedgraph" if ! -e "../bedgraph"     || print  "bedgraph       Building Succeed!  <BedGraph Files>   stored here\n";
 mkdir "../bw" if ! -e "../bw"                 || print  "bigwig         Building Succeed!  <BigWig Files>     stored here\n";
 mkdir "./tmp/" if ! -e "./tmp/"               || print  "tmp            Building Succeed!  <tmp Files>        stored here\n";
-mkdir "./tmp/" if ! -e "./tmp/"               || print  "hapinfo        Building Succeed!  <hapinfo Files>    stored here\n";
+mkdir "./hapinfo/" if ! -e "./hapinfo/"       || print  "hapinfo        Building Succeed!  <hapinfo Files>    stored here\n";
 }
 
 
