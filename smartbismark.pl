@@ -4,7 +4,7 @@
 # Good habit to creat parameter table for a project
 # Contact: Shicheng Guo
 # Version 1.3
-# Update: 05/24/2017
+# Update: 12/17/2016
 
 use strict;
 use Cwd;
@@ -248,8 +248,11 @@ sub print_helpfile{
 	
 	Last edited on 15 Apirl 2017 <contact: Shihcheng.Guo\@gmail.com>.
 	
-	--input    Single-end or pair-end fastq file list. For single-end fastq, one file in each line.
-	           For pair-end fastq files, paired fastq files should be listed in one line with TAB. 
+	--input    Configure files including SRR and SRX information. Script will extract SRR and SRX
+		   information automatically and then download the corresponding SRR files and then do
+	           the further bismark alignment, sort and hapinfo calling. Single-end or pair-end fas
+		   tq file list. For single-end fastq, one file in each line. For pair-end fastq files,
+                   paired fastq files should be listed in one line with TAB. 
 	
 	--genome   hg19, hg38, mm9, mm10. The option is used to determined which bismark alignment ref-
 	           erence will be chosed. if you have new reference rather than huamn and mouse, please
