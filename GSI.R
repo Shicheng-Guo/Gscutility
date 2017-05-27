@@ -23,14 +23,12 @@ gsi<-function (matrix){
     refmean<-tapply(as.numeric(matrix[i, ]), index, function(x) mean(x, na.rm = T))
     refmax<-refmean[which.max(refmean)]
     gmax <- names(refmax)
+    for (j in 1:length(group)) {
+      tmp <- (1 - 10^(mean(na.omit(as.numeric(matrix[i, which(index == group[j])])), na.rm = T))/10^(mean(na.omit(as.numeric(matrix[i,which(index == gmax)])))))/(length(group) - 1)
+      gsit <- c(gsit, tmp)
+    }
     if(sum(refmean>0.3,na.rm=T)>1){
       gmax<-gsub(" ","",paste(unique(c(gmax,names(refmean)[which(refmean>0.3)])),',',collapse =""))
-    }
-    for (j in 1:length(group)) {
-      tmp <- (1 - 10^(mean(na.omit(as.numeric(matrix[i, which(index == 
-                                                                group[j])])), na.rm = T))/10^(mean(na.omit(as.numeric(matrix[i, 
-                                                                                                                             which(index == gmax)])))))/(length(group) - 1)
-      gsit <- c(gsit, tmp)
     }
     gmaxgroup <- c(gmaxgroup, gmax)
     GSI <- c(GSI, sum(gsit, na.rm = T))
