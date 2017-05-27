@@ -11,28 +11,35 @@ colname<-read.table("header.txt",sep="\t",row.names=1,colClasses=c("character",r
 data<-read.table("PancancerMethMatrixjb",sep="\t",colClasses=c("character",rep("numeric",6440)),nrow=2500,row.names=1)
 group<-paste(saminfo[match(colname,saminfo[,1]),3],"_",saminfo[match(colname,saminfo[,1]),4],sep="")
 
-
-
-gsi<-function(data){
-  group=names(table(colnames(data)))
-  index=colnames(data)
-  gsi<-c()
-  gmaxgroup<-c()
-  for(i in 1:nrow(data)){
-    gsit<-0
-    gmax<-names(which.max(tapply(as.numeric(data[i,]),index,mean)))
-    for(j in 1:length(group)){
-      tmp<-(1-10^(mean(data[i,][which(index==group[j])]))/10^(mean(data[i,][which(index==gmax)])))/(length(group)-1)
-      gsit<-gsit+tmp
+gsi<-function (matrix){
+  group = names(table(colnames(matrix)))
+  index = colnames(matrix)
+  GSI <- c()
+  gmaxgroup <- c()
+  refMean<-c()
+  refMax<-c()
+  for (i in 1:nrow(matrix)) {
+    gsit <- 0    
+    refmean<-tapply(as.numeric(matrix[i, ]), index, function(x) mean(x, na.rm = T))
+    refmax<-refmean[which.max(refmean)]
+    gmax <- names(refmax)
+    if(sum(refmean>0.3,na.rm=T)>1){
+      gmax<-gsub(" ","",paste(unique(c(gmax,names(refmean)[which(refmean>0.3)])),',',collapse =""))
     }
-    gmaxgroup<-c(gmaxgroup,gmax)
-    gsi<-c(gsi,gsit)
-    print(c(gmax,gsit))
-  }
-  rlt=data.frame(region=rownames(data),group=gmaxgroup,GSI=gsi)
+    for (j in 1:length(group)) {
+      tmp <- (1 - 10^(mean(na.omit(as.numeric(matrix[i, which(index == 
+                                                                group[j])])), na.rm = T))/10^(mean(na.omit(as.numeric(matrix[i, 
+                                                                                                                             which(index == gmax)])))))/(length(group) - 1)
+      gsit <- c(gsit, tmp)
+    }
+    gmaxgroup <- c(gmaxgroup, gmax)
+    GSI <- c(GSI, sum(gsit, na.rm = T))
+    refMean<-c(refMean,gsub(" ","",paste(round(refmean,5),',',collapse ="")))
+    refMax<-c(refMax,refmax)    
+  }  
+  rlt = data.frame(region = rownames(matrix), group = gmaxgroup, GSI = GSI, refMax=refMax,refMean=refMean)
   return(rlt)
 }
-
 
 RawNARemove<-function(data,missratio=0.3){
   threshold<-(missratio)*dim(data)[2]
