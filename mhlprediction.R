@@ -49,7 +49,7 @@ bio<-gsi2bio(gsirlt1)
 data=read.table(opt$file,head=T,row.names=1,sep="\t")
 
 rlt<-c()
-for(i in seq(0,0.8,0.1)){
+for(i in seq(0.2,0.8,0.1)){
   rlt<-rbind(rlt,prediction(data,bio,tt=i))
 }
 rownames(rlt)<-paste("R",seq(0,0.8,0.1),sep="")
