@@ -27,7 +27,7 @@ HeatMap<-function(data){
   heatmap.2(data,trace="none", 
             hclust=Hclust,
             distfun=Distfun, 
-            cexRow = 1, cexCol = 1,
+            cexRow = 0.5, cexCol = 0.5,
             ColSideColors=ColSideColors,
             density.info="none",col=colors,
             Colv=T,Rowv = TRUE,
