@@ -11,7 +11,16 @@ colname<-read.table("header.txt",sep="\t",row.names=1,colClasses=c("character",r
 data<-read.table("PancancerMethMatrixjb",sep="\t",colClasses=c("character",rep("numeric",6440)),nrow=2500,row.names=1)
 group<-paste(saminfo[match(colname,saminfo[,1]),3],"_",saminfo[match(colname,saminfo[,1]),4],sep="")
 
+#' adopted group specific index
+#' matrix are require at least one non-NA values in each row
+#' @param data.frame of a matrix with colnames as the variable of group name
+#' @return a data frame including GSI, reference assigned and AMF for each reference
+#' @export
 gsi<-function (matrix){
+  narow<-which(unlist(apply(matrix,1,function(x) all(is.na(x)))))
+  if(length(narow)>1){
+    matrix<-matrix[-narow,]
+  }
   group = names(table(colnames(matrix)))
   index = colnames(matrix)
   GSI <- c()
@@ -35,6 +44,9 @@ gsi<-function (matrix){
     refMean<-c(refMean,gsub(" ","",paste(round(refmean,5),',',collapse ="")))
     refMax<-c(refMax,refmax)    
   }  
+  if(nrow(matrix)!=length(refmax)){
+    print("input matrix can not be allowed to be all NA in some row! please check your matrix!")
+  }
   rlt = data.frame(region = rownames(matrix), group = gmaxgroup, GSI = GSI, refMax=refMax,refMean=refMean)
   return(rlt)
 }
