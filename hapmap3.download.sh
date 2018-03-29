@@ -11,3 +11,5 @@ wget https://www.broadinstitute.org/files/shared/mpg/hapmap3/hapmap3_r1_b36_fwd_
 wget https://www.broadinstitute.org/files/shared/mpg/hapmap3/hapmap3_r1_b36_fwd_consensus.qc.poly.recode.map.bz2
 bzip2 -d hapmap3_r1_b36_fwd_consensus.qc.poly.recode.ped.bz2
 bzip2 -d hapmap3_r1_b36_fwd_consensus.qc.poly.recode.map.bz2
+
+wget https://www.broadinstitute.org/files/shared/mpg/hapmap3/relationships_w_pops_051208.txt
