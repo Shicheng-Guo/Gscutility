@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 
 # A perl script to merge bismark cov file by SRX list.
-# Contact: Shihcheng.Guo@Gmail.com
 # Version 1.3
 # Go to http://sra.dnanexus.com/studies/SRP028600/samples
 # Select SRS and Click Related RUNS then get the Table as the input
