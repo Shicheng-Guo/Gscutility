@@ -1,14 +1,19 @@
-This note is used for a step to mention ourselves to configure a bioinformatics server step by step. 
+#### This note is used for a step to mention ourselves to configure a bioinformatics server step by step. 
+####  R, perl, python
 
-1. Install Ubuntu, Redhat, Centos
+# Install Ubuntu, Redhat, Centos
 
-2. install R, Python, Perl and related packages. 
+# install R, Python, Perl and related packages. 
 
-3. Download and install UCSC binary ulities
+# Download and install UCSC binary ulities
 
-4. Download and install UCSC binary ulities
 
-cd ~/tools/bin
-wget https://raw.githubusercontent.com/Shicheng-Guo/Gscutility/master/ucscUtilityDownload.sh
-sh ucscUtilityDownload.sh
-
+# Download and install UCSC binary ulities
+ mkdir ~/tools/bin
+ cd ~/tools/bin
+ wget https://raw.githubusercontent.com/Shicheng-Guo/Gscutility/master/ucscUtilityDownload.sh
+ sh ucscUtilityDownload.sh
+ cat "$PATH=$HOME/tools/bin:$PATH"
+ source ~/.bashrc
+ 
+ 
