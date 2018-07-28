@@ -8,3 +8,7 @@ This note is used for a step to mention ourselves to configure a bioinformatics 
 
 4. Download and install UCSC binary ulities
 
+cd ~/tools/bin
+wget https://raw.githubusercontent.com/Shicheng-Guo/Gscutility/master/ucscUtilityDownload.sh
+sh ucscUtilityDownload.sh
+
