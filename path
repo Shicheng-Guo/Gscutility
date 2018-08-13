@@ -1,0 +1,2 @@
+#!/bin/bash
+pwd | sed 's/\//\\/g' | sed 's/mnt/\\mcrfnas2/g'
