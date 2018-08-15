@@ -22,7 +22,8 @@ use strict;
 use Cwd;
 my $dir=getcwd;
 chdir $dir;
-my @file=glob("*.tab");
+my $chr=shift @ARGV;
+my @file=glob("*$chr.tab");
 
 my %mf;
 my %pos;
@@ -36,7 +37,7 @@ while(<F>){
         my @line=split /\t/;
         my $region=$line[0];
         $pos{$region}=$region;
-        if($line[2]>=1){
+        if($line[2]>=10){
         $mf=$line[$#line];
         }else{
         $mf="NA";
@@ -44,8 +45,6 @@ while(<F>){
         $mf{$region}{$sam}=$mf;
         }
 }
-
-######## Print Matrix-header
 my @sam;
 foreach my $sam(sort keys %sam){
         push(@sam,$sam);
@@ -65,3 +64,4 @@ foreach my $pos(sort keys %mf){
         }
         print "\n";
 }
+
