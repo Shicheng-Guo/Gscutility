@@ -1,0 +1,13 @@
+use Cwd;
+my $dir=getcwd;
+chdir $dir;
+open F,shift @ARGV;
+my $vcfdir="/gpfs/home/guosa/hpc/db/hg19/1000Genome";
+my $pop="/gpfs/home/guosa/hpc/db/hg19/1000Genome/CEU.txt";
+while(<F>){
+        chomp;
+        my($chr,$start,$end,$rs1,$rs2)=split/\s+/;
+        my $vcf="$vcfdir/$chr.uni.vcf";
+        my $out=`plink --vcf $vcf --keep $pop --r2 --ld $rs1 $rs2`;
+         print "out";
+}
