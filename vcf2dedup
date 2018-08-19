@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+use Cwd;
+my $dir=getcwd;
+chdir $dir;
+my %snp;
+my %pos;
+my $file=shift @ARGV;
+#print "$dir\n";
+#open F,"<:gzip",$file || die "cannot open or find $file\n";
+open F,$file || die "cannot open or find $file\n";
+while(<F>){
+  my $line=$_;
+  my ($chr,$pos,$rs)=split/\s+/,$line;
+  next if ($pos{"$chr:$pos"} || $snp{$rs});
+  $pos{"$chr:$pos"}="$rs";
+  $pos{"$rs"}="$rs";
+  print "$line";
+}
+close F;
