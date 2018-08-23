@@ -2,7 +2,7 @@
 use strict;
 use Cwd;
 chdir getcwd;
-my $file="NCBIRefGene_GRCH37";
+my $file="/gpfs/home/guosa/hpc/db/hg19/NCBIRefGene_GRCH37";
 open F,$file;
 while(<F>){
   next if /#|chrUn|random|hap/;
