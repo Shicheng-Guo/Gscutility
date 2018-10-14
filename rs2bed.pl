@@ -1,5 +1,6 @@
 
 #!/usr/bin/perl
+# only work in CHG1 requir large memmory. 
 use strict;
 use Cwd;
 use List::Util qw( min max );
