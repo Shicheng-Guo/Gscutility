@@ -1,5 +1,4 @@
 #! /bin/bash
-
 #=============Set Working Directory====================
 #=============Get the file name========================
 Folder="/home/shg047/oasis/Minghua2016/fastq"
