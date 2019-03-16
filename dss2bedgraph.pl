@@ -1,8 +1,8 @@
-
 use strict;
+# read all the dss files of same group and return the average methylation level
 use Cwd;
 my $dir=getcwd;
-my @file=glob("*.dss");
+my @file=glob("*OA*.dss");
 my %data;
 foreach my $file (@file){
 open F,$file;
