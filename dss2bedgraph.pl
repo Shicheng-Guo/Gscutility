@@ -2,7 +2,7 @@
 use strict;
 use Cwd;
 my $dir=getcwd;
-my @file=glob("*OA*.dss");
+my @file=glob("*.dss");
 my %data;
 foreach my $file (@file){
 open F,$file;
