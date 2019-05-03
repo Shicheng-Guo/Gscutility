@@ -20,6 +20,7 @@ chan<-function(x){
 assess<-function(model,train,test,trainlabel,testlabel){
   t1<-table(chan(predict(model, train)), trainlabel)
   t2<-table(chan(predict(model, test)), testlabel)
+  if(nrow(t1)==2 && nrow(t2)==2){
   sen.train<-t1[2,2]/(t1[1,2]+t1[2,2])
   spe.train<-t1[1,1]/(t1[2,1]+t1[1,1])
   sen.test<-t2[2,2]/(t2[1,2]+t2[2,2])
@@ -28,6 +29,7 @@ assess<-function(model,train,test,trainlabel,testlabel){
   accu.test<-(t2[1,1]+t2[2,2])/sum(t2)
   rlt<-c(sen.train,spe.train, accu.train,sen.test,spe.test,accu.test)
   rlt
+  }
 }
 assess2<-function(model1,model2,trainlabel,testlabel){
   t1<-table(model1,trainlabel)
