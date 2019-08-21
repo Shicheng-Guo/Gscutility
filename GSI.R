@@ -67,7 +67,6 @@ RawNARemove<-function(data,missratio=0.3){
 library("impute")
 data<-read.table(file="outputFile",sep="\t",head=T,colClasses=c("character",rep("numeric",6440)),nrows=5,row.names=1,comment.char ="",as.is=T,check.names=F)
 
-
 colnames(data)
 strsplit()
 data<-matrix(rnorm(485579*6500,1,1),485579,6500)
