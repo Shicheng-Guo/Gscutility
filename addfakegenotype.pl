@@ -1,3 +1,5 @@
+# How to add fake genotypes for dbsnp152 vcf file
+
 use strict;
 open F,"/home/guosa/hpc/db/hg19/dbSNP152.hg19.vcf";
 while(<F>){
