@@ -1,4 +1,4 @@
-# How to add fake genotypes for dbsnp152 vcf file
+# How to add fake genotypes for dbsnp152 vcf file so that we can transfer vcf to plink
 
 use strict;
 open F,"/home/guosa/hpc/db/hg19/dbSNP152.hg19.vcf";
