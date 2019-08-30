@@ -5,7 +5,6 @@ use IO::Handle;
 use File::Basename;
 use Getopt::Long;
 $|++;
-
 # Separate Enhancer, Promoter, TSS, 5UTR, Exon, Intron, 3UTR from refGene files.
 # Contact: Shicheng Guo
 # Version 1.3
@@ -15,12 +14,10 @@ $|++;
 # TSS:      [Tss-500,Tss+2K]
 # mm9.chrom.sizes, download from http://hgdownload.cse.ucsc.edu/goldenPath/mm9/bigZips/mm9.chrom.sizes
 # hg19.chrom.sizes, download from http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/hg19.chrom.sizes
-
 my $haptools="v0.16.3_dev";
-my ($refGene,$output,$chromsize,$help)=commandopt();
-# my $refGene=shift @ARGV;
-# my $ChromSize=shift @ARGV;
-
+my $refGene= shift @ARGV;
+my $chromsize= shift @ARGV;
+my $output= shift @ARGV;
 open F,$chromsize || die "cannot find or open $chromsize!";
 my %chromesize;
 while(<F>){
@@ -29,26 +26,22 @@ my ($chr,$size)=split /\s+/;
 $chromesize{$chr}=$size;
 }
 my($filename, $dirs, $suffix) = fileparse($refGene,qr/\./);
-#my($filename, $dirs, $suffix) = fileparse($refGene);
 open TSS,">$filename.tss.bed";
 open GENE,">$filename.bed";
 
 open IN, $refGene or die "Can't open $refGene\n";
 my %refGene;
 while(<IN>){
-#    next if /"random"|"hap"|"chrUN"/;
     my ($bin,$NM,$chr,$strand,$txStart, $txEnd, $cdsStart, $cdsEnd, $exonCount, $exonStarts, $exonEnds,undef,$genesymbol,undef) = split /\t/;
     my @exonStarts = split(",", $exonStarts);
     my @exonEnds = split(",", $exonEnds);
     if($strand eq "+"){
-    # gene in positive strand	
     my @enhancer=($txStart-4000,$txStart-2001);
     my @promter=($txStart-2000,$txStart+2000);
 	my @TSS=($txStart-500,$txStart+2000);
 	my @UTR5=($txStart,$cdsStart);
 	my @UTR3=($cdsEnd,$txEnd);
 	next if $enhancer[0] <=0;
-	# print "$chr\t$chromesize{$chr}\tUTR3: $UTR3[1]\t$chromesize{$chr}\t";  # debug
     next if $UTR3[1] >= $chromesize{$chr};
     print GENE "$chr\t$enhancer[0]\t$enhancer[1]\t$strand\t$NM\t$genesymbol\tEnhancer\tEnhancer\n";
     print GENE "$chr\t$promter[0]\t$promter[1]\t$strand\t$NM\t$genesymbol\tPromoter\tPromoter\n";
@@ -64,7 +57,6 @@ while(<IN>){
     print GENE "$chr\t$exonStarts[$#exonStarts]\t$exonEnds[$#exonStarts]\t+\t$NM\t$genesymbol\tExon\tExon$exonrank\n";
     print GENE "$chr\t$UTR3[0]\t$UTR3[1]\t$strand\t$NM\t$genesymbol\tUTR3\tUTR3\n";
     }elsif($strand eq '-'){
-    # gene in negative strand
     my @enhancer=($txEnd+2001,$txEnd+4000);
     my @promter=($txEnd-2000,$txEnd+2000);
     my @TSS=($txEnd-500,$txEnd+2000);
@@ -90,23 +82,4 @@ while(<IN>){
     }        
 }
 	close TSS;
-	print "Finished! Files were created as $filename.tss.bed and $filename.bed\n\n";
-	
-sub commandopt{
-	my ($help,$input,$output,$bed);
-	my $command_line=GetOptions ( "refGene=s"=> \$refGene,"output=s"=> \$output,"chromsize=s"=> \$chromsize,"help"=>\$help);
-	return($refGene,$output,$chromsize,$help);
-}
-	
-sub ref2tss{
-	
-	
-}
-        
-sub ref2segment{
-	
-	
-}
-
-
-     
+	print "\nFinished! Files were created as $filename.tss.bed and $filename.bed\n\n";
