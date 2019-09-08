@@ -8,7 +8,7 @@ foreach my $fastq(@fastq){
         my $job_file_name = $fastq.".job";
         open JOB_FILE, ">$job_file_name" || die("Error in opening file $job_file_name.\n");
         print JOB_FILE "#!/bin/csh\n";
-        print JOB_FILE "#PBS -q hotel\n";
+        print JOB_FILE "#PBS -q shortq\n";
         print JOB_FILE "#PBS -l nodes=1:ppn=1\n";
         print JOB_FILE "#PBS -o ".$fastq.".log\n";
         print JOB_FILE "#PBS -e ".$fastq.".err\n";
