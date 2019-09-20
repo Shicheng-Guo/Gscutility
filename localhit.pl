@@ -5,7 +5,6 @@ while(<DB1>){
 chomp;
 next if $_ !~ /ADD/i;
 my @line=split/\s+/;
-print "SNP: $line[2]\n";
 $db{$line[2]}="$line[2]\t$line[3]\t$line[12]\ttyped";
 }
 close DB1;
