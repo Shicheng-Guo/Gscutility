@@ -15,6 +15,7 @@ while(<DB2>){
 chomp;
 next if /CHR_A/;
 my @line=split /\s+/,$_;
+next if ! defined $db{$line[6]};
 next if defined $snp{$line[6]};
 print "$db{$line[6]}\t$line[7]\n";
 $snp{$line[6]}=$line[6];
