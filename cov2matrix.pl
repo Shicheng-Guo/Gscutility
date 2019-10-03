@@ -26,6 +26,7 @@ my %mf;
 my %pos;
 my %sam;
 foreach my $sam(@file){
+my ($sam)=split/\_R1/,$sam;
 $sam{$sam}=$sam;
 open F,$sam;
 while(<F>){
