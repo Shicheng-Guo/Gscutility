@@ -1,3 +1,5 @@
+
+#################PHE##############################################
 # 2019/11/02
 cd /gpfs/home/guosa/hpc/rheumatology/RA/he2020/impute/R3
 input="CUBN"
@@ -56,7 +58,7 @@ awk '$5=="ADD"{print}' ROI.assoc.logistic >> ROI.assoc.logistic.add
 sort -k12n,12 ROI.assoc.logistic | head -n 3
 sort -k12n,12 ROI.assoc.logistic | tail -n 3
 
-rs="rs2356827"
+rs="rs12243895"
 chr=10
 grep $rs ROI.assoc.logistic
 cp ROI.dbsnp.fam $rs.fam
@@ -72,3 +74,4 @@ echo  'Abstract: The heritability of RA has been shown from twin studies to be 6
 echo "Run title:" $rs "in" $input "and Seropositive Rheumatoid Arthritis" >> readme.txt
 echo "Reference: https://github.com/CNAID/Publication/blob/master/2018/1-s2.0-S155608641830090X-main.pdf" >>readme.txt
 echo "Reference: https://github.com/CNAID/Publication/blob/master/2019/nejmoa18015622019.pdf" >>readme.txt
+
