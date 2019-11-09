@@ -3,7 +3,7 @@
 # bismark to alignment pair-end targeted methylation sequencing from multiplex pcr (targeted bisulfite sequencing)
 # Contact: Shicheng Guo
 # Version 1.4
-# Update: 10/02/2019
+# Update: 11/09/2019
 # smartbismark.pl 
 # USAGE: perl smartbismark.pl --input SraRunTable.txt --genome hg19 --phred=33 --server MCRI --queue shortq --BismarkRefereDb --submit 
 
