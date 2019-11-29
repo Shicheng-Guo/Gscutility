@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# add dbsnp153 to the file according to "chr-pos-ref-alt"
+# add dbsnp153 to the file according to chr-pos-ref-alt in hg19 human genome
 # contact: Shihcheng.Guo@gmail.com
 
 use strict;
