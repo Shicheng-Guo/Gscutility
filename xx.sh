@@ -4,7 +4,7 @@ s
 x
 xsss
 s
-sss
+ssss
 sss
 s
 ssssssss
