@@ -3,7 +3,7 @@ xx
 s
 x
 xsss
-s
+ss
 ssss
 ssss
 s
