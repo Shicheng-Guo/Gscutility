@@ -1,7 +1,7 @@
 xx
 xx
 s
-x
+xs
 xssss
 ss
 ssss
