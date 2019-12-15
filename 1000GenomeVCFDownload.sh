@@ -3,7 +3,7 @@ for i in {1..22} X Y MT
 do
 wget http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr$i.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz
 wget http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr$i.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz.tbi
-done 
+done x
 xxxxxxxxxxxxxxxx
 xxxxxxxxxxxxxxxxx
 # download part data with perl script 
