@@ -6,7 +6,7 @@ x
 x
 xx
 xxx
-x
+xx
 xx
 xx
 x
