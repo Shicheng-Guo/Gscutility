@@ -3,7 +3,8 @@
 # Run the script to the Bam directory of the bismark
 # Contact: Shicheng Guo
 # Version 1.3
-# Update: Jan/19/2016
+# Update: 12/25/2019
+# perl sradownloadMCRI.pbs.pl SraRunTable.txt submit
 
 use strict;
 use Cwd;
