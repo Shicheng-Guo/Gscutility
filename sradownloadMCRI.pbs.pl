@@ -22,7 +22,7 @@ while(<F>){
     chomp;
     next if /SRRID/;
     next if /^\s+$/;
-    my @line = split /\t/; 
+    my @line = split /\t|,/; 
     my $SRR_column;    
     foreach my $line(@line){
     $SRR_column++;
