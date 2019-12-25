@@ -15,7 +15,7 @@ my $project="Fastq";
 my $analysis="";
 my $ppn=1;
 my $walltime="168:00:00";
-my $queue="hotel"; # hotel
+my $queue="shortq"; # hotel
 
 open F,$sraFiles;
 while(<F>){
@@ -45,9 +45,8 @@ while(<F>){
     print OUT "#PBS -o ".$id.".log\n";
     print OUT "#PBS -e ".$id.".err\n";
     print OUT "#PBS -V\n";
-    print OUT "#PBS -M shicheng.guo\@gmail.com \n";
+    print OUT "#PBS -M Guo.Shicheng\@marshfieldresearch.org\n";
     print OUT "#PBS -m abe\n";
-    print OUT "#PBS -A k4zhang-group\n";
     print OUT "cd $curr_dir\n";
     print OUT "fastq-dump --split-files --gzip $id\n";    
     close(OUT);
