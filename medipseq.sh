@@ -8,3 +8,6 @@ perl sradownloadMCRI.pbs.pl SraRunTable.txt submit
 # fastq2bam
 
 # bam2narrowpeak
+
+
+# Combine ChIP-seq peaks from multiple replicates via consensus voting
