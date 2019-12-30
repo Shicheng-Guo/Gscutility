@@ -10,8 +10,6 @@
 # --step : specify step size. Note that span is set to be identical to step.
 # --compact : if selected, steps with value equal to 0 will not be printed. This saves space but was not allowed in original wig format, thus some scripts using wig file as input may not understand it.
 
-
-
 use strict;
 use warnings;
 use Getopt::Long;
