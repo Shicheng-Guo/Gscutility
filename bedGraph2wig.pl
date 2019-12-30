@@ -66,6 +66,7 @@ while (<IN>) {
   # Skip comment lines
   next if (/^track/);
   next if (/^#/);
+  next if /chrUn/i;
 
   # Parse relevant information in current line 
   # e.g: chr1 3000400 3000500 2
