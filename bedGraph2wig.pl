@@ -3,6 +3,7 @@
 # Description: This script converts bedGraph to fixedStep wig format with defined step size. Input file may be compressed as .gz.
 # Coordinates in bedGraph input are assumed to be 0-based (http://genome.ucsc.edu/goldenPath/help/bedgraph.html).
 # Coordinates in wig output are 1-based (http://genome.ucsc.edu/goldenPath/help/wiggle.html). 
+# Update: 12/30/2019
 
 # Usage: bedgraph_to_wig.pl --bedgraph input.bedgraph --wig output.wig --step step_size [--compact]
 # --bedgraph : specify input file in bedGraph format.
