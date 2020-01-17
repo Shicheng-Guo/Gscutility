@@ -6,7 +6,8 @@
 # Update: 10/22/2019
 # smartbismark.pl 
 # USAGE: perl smartbismark.pl --input SraRunTable.txt --genome hg19 --phred=33 --server MCRI --queue shortq --BismarkRefereDb --submit 
-
+fastqtrim
+fastq_trim
 use strict;
 use Cwd;
 use Getopt::Long;
@@ -64,9 +65,9 @@ my $bismark="bismark --bowtie2 --multicore $multicore --fastq -N 1";
 my $coverage2cytosine="coverage2cytosine --merge_CpG --gzip --genome_folder";
 
 print OUT "fastq-dump --skip-technical --split-files --gzip $SRR\n";
-print OUT "trim_galore --paired --stringency 1 --fastqc -e 0.2 --phred$phred --clip_R1 3 --clip_R2 3 --fastqc --illumina $sample1\.fastq.gz $sample2\.fastq.gz --output_dir ../fastq_trim\n";
-print OUT "fastq_screen --subset 0  --force --threads 12 --conf  ~/hpc/tools/fastq_screen_v0.14.0/FastQ_Screen_Genomes/fastq_screen.conf ../fastq_trim/$sample1\_val_1.fq.gz -2 ../fastq_trim/$sample2\_val_2.fq.gz --outdir ../fastqscreen/\n";
-print OUT "$bismark --phred$phred-quals $BismarkRefereDb -1 ../fastq_trim/$sample1\_val_1.fq.gz -2 ../fastq_trim/$sample2\_val_2.fq.gz -o ../bam\n";
+print OUT "trim_galore --paired --stringency 1 --fastqc -e 0.2 --phred$phred --clip_R1 3 --clip_R2 3 --fastqc --illumina $sample1\.fastq.gz $sample2\.fastq.gz --output_dir ../fastqtrim\n";
+print OUT "fastq_screen --subset 0  --force --threads 12 --conf  ~/hpc/tools/fastq_screen_v0.14.0/FastQ_Screen_Genomes/fastq_screen.conf ../fastqtrim/$sample1\_val_1.fq.gz -2 ../fastqtrim/$sample2\_val_2.fq.gz --outdir ../fastqscreen/\n";
+print OUT "$bismark --phred$phred-quals $BismarkRefereDb -1 ../fastqtrim/$sample1\_val_1.fq.gz -2 ../fastqtrim/$sample2\_val_2.fq.gz -o ../bam\n";
 print OUT "filter_non_conversion --paired ../bam/$sample1\_val_1_bismark_bt2_pe.bam\n";
 print OUT "deduplicate_bismark --bam ../bam/$sample1\_val_1_bismark_bt2_pe.nonCG_filtered.bam\n";   
 print OUT "$extractor --comprehensive --output ../methyfreq  ../bam/$sample1\_val_1_bismark_bt2_pe.nonCG_filtered.bam\n";
@@ -98,8 +99,8 @@ close OUT;
 	print OUT "#PBS -A k4zhang-group\n";
 	print OUT "cd $curr_dir\n";  
 	print OUT "fastq-dump --skip-technical --gzip $sample\n";
-	print OUT "trim_galore --phred$phred -e 0.2 --fastqc $sample.fastq.gz --output_dir ../fastq_trim\n";
-	print OUT "bismark --bowtie2 --phred$phred-quals --fastq -N 1 --multicore $multicore $BismarkRefereDb ../fastq_trim/$sample\_trimmed.fq.gz -o ../bam\n";  
+	print OUT "trim_galore --phred$phred -e 0.2 --fastqc $sample.fastq.gz --output_dir ../fastqtrim\n";
+	print OUT "bismark --bowtie2 --phred$phred-quals --fastq -N 1 --multicore $multicore $BismarkRefereDb ../fastqtrim/$sample\_trimmed.fq.gz -o ../bam\n";  
 	print OUT "filter_non_conversion --single ../bam/$sample\_trimmed_bismark_bt2.bam\n"; 
 	print OUT "deduplicate_bismark --bam ../bam/$sample\_trimmed_bismark_bt2.nonCG_filtered.bam\n";
 	print OUT "$extractor --comprehensive --output ../methyfreq  ../bam/$sample\_trimmed_bismark_bt2.nonCG_filtered.deduplicated.bam\n";
@@ -304,7 +305,7 @@ VERSION
 sub directory_build{
 chdir getcwd;
 print "===================================================================================\n";
-mkdir "../fastq_trim" if ! -e "../fastq_trim"      || print  "fastq_trim     Building Succeed!  <Trimed Fastq>     stored here\n";
+mkdir "../fastqtrim" if ! -e "../fastq_trim"      || print  "fastqtrim     Building Succeed!  <Trimed Fastq>     stored here\n";
 mkdir "../bam" if ! -e "../bam"                    || print  "bam            Building Succeed!    <Bam Files>      stored here\n";
 mkdir "../bedgraph" if ! -e "../bedgraph"          || print  "bedgraph       Building Succeed!  <Bedgraph Files>   stored here\n";
 mkdir "../sortbam" if ! -e "../sortbam"            || print  "sortbam        Building Succeed!  <SortBam Files>    stored here\n";
