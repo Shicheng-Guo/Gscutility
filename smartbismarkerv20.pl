@@ -6,8 +6,8 @@
 # Update: 10/22/2019
 # smartbismark.pl 
 # USAGE: perl smartbismark.pl --input SraRunTable.txt --genome hg19 --phred=33 --server MCRI --queue shortq --BismarkRefereDb --submit 
-fastqtrim
-fastq_trim
+
+
 use strict;
 use Cwd;
 use Getopt::Long;
