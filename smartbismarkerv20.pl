@@ -93,17 +93,17 @@ close OUT;
 	print OUT "#PBS -o $sample.log\n";
 	print OUT "#PBS -e $sample.err\n";
 	print OUT "#PBS -V\n";
-	print OUT "#PBS -M shihcheng.guo\@gmail.com \n";
+	print OUT "#PBS -M shihcheng.guo\@gmail.com\n";
 	print OUT "#PBS -m abe\n";
 	print OUT "#PBS -A k4zhang-group\n";
 	print OUT "cd $curr_dir\n";  
 	print OUT "fastq-dump --skip-technical --gzip $sample\n";
-	print OUT "trim_galore --phred$phred -e 0.2 --fastqc $sample1.fastq.gz --output_dir ../fastq_trim\n";
-	print OUT "bismark --bowtie2 --phred$phred-quals --fastq -N 1 --multicore $multicore $BismarkRefereDb ../fastq_trim/$sample1\_trimmed.fq.gz -o ../bam\n";  
-	print OUT "filter_non_conversion --single ../bam/$sample1\_trimmed_bismark_bt2.bam\n"; 
-	print OUT "deduplicate_bismark --bam ../bam/$sample1\_trimmed_bismark_bt2.nonCG_filtered.bam\n";
-	print OUT "$extractor --comprehensive --output ../methyfreq  ../bam/$sample1\_trimmed_bismark_bt2.nonCG_filtered.deduplicated.bam\n";
-	print OUT "samtools sort ../bam/$sample1\_trimmed_bismark_bt2.nonCG_filtered.deduplicated.bam -o ../sortbam/$sample.bismark_bt2_se.sort.bam\n";
+	print OUT "trim_galore --phred$phred -e 0.2 --fastqc $sample.fastq.gz --output_dir ../fastq_trim\n";
+	print OUT "bismark --bowtie2 --phred$phred-quals --fastq -N 1 --multicore $multicore $BismarkRefereDb ../fastq_trim/$sample\_trimmed.fq.gz -o ../bam\n";  
+	print OUT "filter_non_conversion --single ../bam/$sample\_trimmed_bismark_bt2.bam\n"; 
+	print OUT "deduplicate_bismark --bam ../bam/$sample\_trimmed_bismark_bt2.nonCG_filtered.bam\n";
+	print OUT "$extractor --comprehensive --output ../methyfreq  ../bam/$sample\_trimmed_bismark_bt2.nonCG_filtered.deduplicated.bam\n";
+	print OUT "samtools sort ../bam/$sample\_trimmed_bismark_bt2.nonCG_filtered.deduplicated.bam -o ../sortbam/$sample.bismark_bt2_se.sort.bam\n";
 	print OUT "samtools index ../sortbam/$sample.bismark_bt2_se.sort.bam\n";
 	print OUT "perl ~/bin/samInfoPrep4Bam2Hapinfo.pl ~/oasis/db/hg19/hg19.cut10k.bed > saminfo.txt\n";
 	print OUT "perl ~/bin/bam2hapInfo2PBS.pl saminfo.txt submit bismark $chrLenhg19 $cpgPoshg19\n";
@@ -133,12 +133,12 @@ sub process_command_line{
 	my $command_line=GetOptions ( 
                                   "input=s"    		        => \$input,
                                   "genome=s"            	=> \$genome,
-                                  "server=s"   			=> \$server,
-                                  "queue=s"   			=> \$queue,                                                                    
-                                  "help"      			=> \$help,
-                                  "submit=s"   			=> \$submit,
-                                  "BismarkRefereDb=s"           => \$BismarkRefereDb,
-                                  "phred=s"                     => \$phred,
+                                  "server=s"   			    => \$server,
+                                  "queue=s"   			    => \$queue,                                                                    
+                                  "help"      			    => \$help,
+                                  "submit=s"   			    => \$submit,
+                                  "BismarkRefereDb=s"       => \$BismarkRefereDb,
+                                  "phred=s"                 => \$phred,
                                   );
 	
     unless (defined $genome){
