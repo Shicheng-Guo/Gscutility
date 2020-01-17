@@ -102,12 +102,13 @@ close OUT;
 	print OUT "trim_galore --phred$phred -e 0.2 --fastqc $sample.fastq.gz --output_dir ../fastqtrim\n";
 	print OUT "bismark --bowtie2 --phred$phred-quals --fastq -N 1 --multicore $multicore $BismarkRefereDb ../fastqtrim/$sample\_trimmed.fq.gz -o ../bam\n";  
 	print OUT "filter_non_conversion --single ../bam/$sample\_trimmed_bismark_bt2.bam\n"; 
-	print OUT "deduplicate_bismark --bam ../bam/$sample\_trimmed_bismark_bt2.nonCG_filtered.bam\n";
-	print OUT "$extractor --comprehensive --output ../methyfreq  ../bam/$sample\_trimmed_bismark_bt2.nonCG_filtered.deduplicated.bam\n";
-	print OUT "samtools sort ../bam/$sample\_trimmed_bismark_bt2.nonCG_filtered.deduplicated.bam -o ../sortbam/$sample.bismark_bt2_se.sort.bam\n";
+	print OUT "# deduplicate_bismark --bam ../bam/$sample\_trimmed_bismark_bt2.nonCG_filtered.bam\n";
+    print OUT "# mv ../bam/$sample\_trimmed_bismark_bt2.nonCG_filtered.deduplicated.bam ../bam/$sample\_trimmed_bismark_bt2.nonCG_filtered.bam\n";
+	print OUT "$extractor --comprehensive --output ../methyfreq  ../bam/$sample\_trimmed_bismark_bt2.nonCG_filtered.bam\n";
+	print OUT "samtools sort ../bam/$sample\_trimmed_bismark_bt2.nonCG_filtered.bam -o ../sortbam/$sample.bismark_bt2_se.sort.bam\n";
 	print OUT "samtools index ../sortbam/$sample.bismark_bt2_se.sort.bam\n";
-	print OUT "perl ~/bin/samInfoPrep4Bam2Hapinfo.pl ~/oasis/db/hg19/hg19.cut10k.bed > saminfo.txt\n";
-	print OUT "perl ~/bin/bam2hapInfo2PBS.pl saminfo.txt submit bismark $chrLenhg19 $cpgPoshg19\n";
+	print OUT "# perl ~/bin/samInfoPrep4Bam2Hapinfo.pl ~/oasis/db/hg19/hg19.cut10k.bed > saminfo.txt\n";
+	print OUT "# perl ~/bin/bam2hapInfo2PBS.pl saminfo.txt submit bismark $chrLenhg19 $cpgPoshg19\n";
 }
 close(OUT);
  
