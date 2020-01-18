@@ -233,7 +233,7 @@ sub process_command_line{
     glean   => "16",
     condo   => "16",
     default => "6",
-	shortq  => "6",
+	shortq  => "12",
 	longq   => "12",
     );
     %multicore=(
@@ -301,7 +301,6 @@ my $bismark_version=bismark_version();
 VERSION
     exit;
 }
-
 
 
 sub directory_build{
