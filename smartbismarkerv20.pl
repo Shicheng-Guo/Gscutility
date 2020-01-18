@@ -316,7 +316,7 @@ mkdir "../bw" if ! -e "../bw"                      || print  "bigwig         Bui
 mkdir "../hapinfo/" if ! -e "../hapinfo/"          || print  "hapinfo        Building Succeed!  <hapinfo Files>    stored here\n";
 mkdir "../bed/" if ! -e "../bed/"                  || print  "bed            Building Succeed!  <bed Files>        stored here\n";
 mkdir "../fastqc/" if ! -e "../fastqc/"            || print  "fastqc         Building Succeed!  <fastqc Files>     stored here\n";
-mkdir "../fastqscreen/" if ! -e "../fastqscreen/"  || print  "fastqc         Building Succeed!  <fastqscreen>      stored here\n";
+mkdir "../fastqscreen/" if ! -e "../fastqscreen/"  || print  "fastqscreen    Building Succeed!  <fastqscreen>      stored here\n";
 print "===================================================================================\n";
 }
 sub bismark_version{
