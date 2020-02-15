@@ -1,4 +1,5 @@
-Data processing pipeline
+### Data processing pipeline
+
 We have developed a semi-automated data-processing pipeline specifically for NGS experiments (ChIP-Seq, DNase-Seq and RNA-Seq). The pipeline can accommodate datasets from the public domain as well as private ones.
 
 We have made use of several open-source tools to develop our pipelines. Briefly, all the pipelines start by processing the raw data as described below:
