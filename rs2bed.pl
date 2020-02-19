@@ -39,7 +39,7 @@ close F;
 
 open OUT1,">$input.hg19.bed";
 open OUT2,">$input.hg38.bed";
-foreach my $rs(sort keys %snp){
+foreach my $snp(sort keys %snp){
 my ($chr1,$start1,$end1)=split/[:-]/,$db1{$snp};
 my ($chr2,$start2,$end2)=split/[:-]/,$db2{$snp};
 print OUT1 	"$chr1\t$start1\t$end1\t$snp\n";
