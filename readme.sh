@@ -1,3 +1,643 @@
+remote connect to 
+Set-Location \\mcrfnas2\bigdata\Genetic\Projects\shg047\tcga\brafv600e
+C:\Admin\gdc-client.exe download --manifest gdc_manifest.2020-02-25.txt
+
+scp nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/nash/* 
+scp -r cv nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/ResearchCareer
+git push -u origin master
+rm cv 
+
+scp -r hemochromatosis nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/hemochromatosis
+
+find . -name "*." -type 'f' -size -100M -delete
+find . -name "*.*" -type 'f' -size +15000k -delete
+find . -name "*.e*" -type 'f' -delete
+find . -name "*.o*" -type 'f'  -delete
+find . -name "*.job*" -type 'f'  -delete
+find . -name "*" -type 'f' -size +15000k print
+
+scp -r db/* nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/AnnotationDatabase/
+scp -r methylation nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/methylation
+scp * nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/bak/bak2020
+scp * nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/pmrp
+
+
+git add .
+git commit -m 'update'
+git push -u origin master
+
+/home/nu_guos/xxs/autism
+
+du ./ -h --max-depth 1
+
+scp -r cpgSNP nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/cpgSNP
+scp -r autism nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/xxs/autism
+scp -r MIR nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/mirsnp
+
+
+
+scp result_extract_forward* nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/pmrp
+
+
+for i in $(cat case80.txt)
+do
+cp ./*/*$i* ./case
+done
+
+
+
+i="compress"
+echo \#PBS -N $i > $i.job
+echo \#PBS -l nodes=1:ppn=1 >> $i.job
+echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
+echo \#PBS -m abe  >> $i.job
+echo \#PBS -o $(pwd)/temp/ >>$i.job
+echo \#PBS -e $(pwd)/temp/ >>$i.job
+echo \#PBS -m abe  >> $i.job
+echo cd $(pwd) >> $i.job
+echo tar czvf rheumatology.tar.gz rheumatology >> $i.job
+qsub  $i.job
+
+####################################################################################################################
+####################################################################################################################
+# download gnomad
+for i in {1..22} X Y
+do
+wget https://storage.googleapis.com/gnomad-public/release/2.1/vcf/genomes/gnomad.genomes.r2.1.sites.chr$i.vcf.bgz
+wget https://storage.googleapis.com/gnomad-public/release/2.1/vcf/genomes/gnomad.genomes.r2.1.sites.chr$i.vcf.bgz.tbi
+wget https://storage.googleapis.com/gnomad-public/release/2.1/vcf/exomes/gnomad.exomes.r2.1.sites.chr$i.vcf.bgz
+wget https://storage.googleapis.com/gnomad-public/release/2.1/vcf/exomes/gnomad.exomes.r2.1.sites.chr$i.vcf.bgz.tbi
+wget https://storage.googleapis.com/gnomad-public/release/3.0/vcf/genomes/gnomad.genomes.r3.0.sites.chr$i.vcf.bgz
+wget https://storage.googleapis.com/gnomad-public/release/3.0/vcf/genomes/gnomad.genomes.r3.0.sites.chr$i.vcf.bgz.tbi
+done
+####################################################################################################################
+####################################################################################################################
+# vcf2bed
+for i in `ls gnomad.genomes.r2.1.sites.chr*.rec.hsa.gff3.sort.rmdup.biallelic.vcf.bgz`
+do 
+bcftools query -f '%CHROM\t%POS\t%ID\n' $i | awk '{print $1,$2-1,$2,$3}' OFS="\t"
+done
+
+--bmerge 
+
+
+
+cd ~/hpc/rheumatology/RA/RA500
+mkdir michigan
+plink --bfile RA2020-B8 --list-duplicate-vars ids-only suppress-first
+plink --bfile RA2020-B8 --alleleACGT --snps-only just-acgt --exclude plink.dupvar --make-bed --out RA2020-B9
+cd michigan
+
+##############################################################################################
+##############################################################################################
+# Round 1: run merging and try to find dupliates SNPs and then remove them 
+rm mergelist.txt
+for i in {1..22}
+do
+echo chr$i >> mergelist.txt
+done
+plink --merge-list mergelist.txt --make-bed --out 1000plink
+# Round 2: remove duplicates SNPs which stored in `1000plink-merge.missnp`
+mkdir temp
+for i in {1..22}
+do
+echo $i
+echo \#PBS -N $i > $i.job
+echo \#PBS -l nodes=1:ppn=1 >> $i.job
+echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
+echo \#PBS -m abe  >> $i.job
+echo \#PBS -o $(pwd)/temp/ >>$i.job
+echo \#PBS -e $(pwd)/temp/ >>$i.job
+echo \#PBS -m abe  >> $i.job
+echo cd $(pwd) >> $i.job
+echo plink --bfile chr$i --alleleACGT --snps-only just-acgt --exclude 1000plink-merge.missnp --make-bed --out chr$i.uni >> $i.job
+qsub  $i.job
+done
+# Round 3: Try to merge again
+rm mergelist.txt
+for i in {1..22}
+do
+echo chr$i >> mergelist.txt
+done
+plink --merge-list mergelist.txt --make-bed --out 1000plink
+####################################################################################################################
+####################################################################################################################
+# GenomeAsia100K data are available at the links below. Users can download GA100K data in compressed Variant Call Format (VCF) file.
+mkdir ~/hpc/db/GenomeAsia100K
+cd ~/hpc/db/GenomeAsia100K
+for i in {1..22}
+do
+wget --no-check-certificate https://browser.genomeasia100k.org/service/web/download_files/$i.substitutions.annot.cont_withmaf.vcf.gz &
+done
+####################################################################
+####################################################################
+## db152plink.sh
+wget https://raw.githubusercontent.com/Shicheng-Guo/Gscutility/master/db152plink.pl
+perl db152plink.pl >  db152.vcf
+plink --vcf db152.vcf --make-bed --out db152
+
+## db153plink.sh
+wget https://raw.githubusercontent.com/Shicheng-Guo/Gscutility/master/db152plink.pl
+perl db152plink.pl >  db152.vcf
+plink --vcf db152.vcf --make-bed --out db152
+
+mkdir temp
+for i in `ls dbSNP153.hg19.chr*.vcf`
+do
+echo $i
+echo \#PBS -N $i > $i.job
+echo \#PBS -l nodes=1:ppn=1 >> $i.job
+echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
+echo \#PBS -m abe  >> $i.job
+echo \#PBS -o $(pwd)/temp/ >>$i.job
+echo \#PBS -e $(pwd)/temp/ >>$i.job
+echo \#PBS -m abe  >> $i.job
+echo cd $(pwd) >> $i.job
+echo perl addfakegenotype.pl $i\> $i.vcf >>$i.job
+qsub  $i.job
+done
+
+bcftools annotate --rename-chrs chr_name_conv.txt dbSNP153.hg19.chrX.vcf -Oz -o dbSNP153.hg19.chr23.vcf
+
+cd ~/hpc/rheumatology/RA/meta3000/MIR/gnomad
+panel="hsa.gff3"
+mkdir temp
+for i in {1..22} X Y
+do
+echo \#PBS -N $i  > $i.job
+echo \#PBS -l nodes=1:ppn=1 >> $i.job
+echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
+echo \#PBS -o $(pwd)/temp/ >>$i.job
+echo \#PBS -e $(pwd)/temp/ >>$i.job
+echo \#PBS -m abe  >> $i.job
+echo cd $(pwd) >> $i.job
+echo bcftools view -v snps -f PASS -i \'INFO/AF_eas\>0.01\' -R ../$panel.hg19.bed ~/hpc/db/Gnomad/genome/gnomad.genomes.r2.1.sites.chr$i.rec.vcf.bgz -Oz -o gnomad.genomes.r2.1.chr$i.common.vcf.gz>>$i.job
+echo bcftools sort gnomad.genomes.r2.1.chr$i.common.vcf.gz -Oz -o gnomad.genomes.r2.1.chr$i.sort.vcf.gz >> $i.job
+echo bcftools view -m2 -M2 -v snps gnomad.genomes.r2.1.chr$i.sort.vcf.gz -Oz -o gnomad.genomes.r2.1.chr$i.$panel.vcf.gz >>$i.job
+qsub $i.job
+done
+
+for i in `ls gnomad.genomes.r2.1.chr*.hsa.gff3.vcf.gz`
+do 
+bcftools query -f '%CHROM\t%POS\t%ID\n' $i | awk '{print $1,$2-1,$2,$3}' OFS="\t" >> miRNA.cESA.gnomad.hg19.bed 
+done
+
+
+
+
+cd ~/hpc/rheumatology/RA/meta3000/MIR/GenomeAsia100K
+panel="hsa.gff3"
+mkdir temp
+for i in {1..22} X Y
+do
+echo \#PBS -N $i  > $i.job
+echo \#PBS -l nodes=1:ppn=1 >> $i.job
+echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
+echo \#PBS -o $(pwd)/temp/ >>$i.job
+echo \#PBS -e $(pwd)/temp/ >>$i.job
+echo \#PBS -m abe  >> $i.job
+echo cd $(pwd) >> $i.job
+echo bcftools view -v snps -f PASS -i \'INFO/AF_SAS\>0.01 \&INFO/AF_SEA\>0.01\' -R ../$panel.hg19.bed $i.GenomeAsia100K.norm.vcf.gz -Oz -o $i.GenomeAsia100K.common.vcf.gz >>$i.job
+echo bcftools sort $i.GenomeAsia100K.common.vcf.gz -Oz -o $i.GenomeAsia100K.common.sort.vcf.gz >> $i.job
+echo bcftools view -m2 -M2 -v snps $i.GenomeAsia100K.common.sort.vcf.gz -Oz -o $i.GenomeAsia100K.$panel.vcf.gz >>$i.job
+qsub $i.job
+done
+
+rm miRNA.cESA.GenomeAsia100K.hg19.bed 
+for i in `ls *.GenomeAsia100K.hsa.gff3.vcf.gz`
+do 
+bcftools query -f '%CHROM\t%POS\t%ID\n' $i | awk '{print $1,$2-1,$2,$3}' OFS="\t" >> miRNA.cESA.GenomeAsia100K.hg19.bed 
+done
+
+d1<-unique(read.table("miRNA.ESA.gnomad.common.uni.hg19.bed",sep="\t"))
+d2<-unique(read.table("miRNA.ESA.GenomeAsia100K.common.hg19.bed.uni.bed",sep="\t"))
+d3<-unique(d1[d1$V4 %in% d2$V4,])
+write.table(d3,file="hsa.gff3.common.hg19.bed",sep="\t",quote=F,col.names=F,row.names=F)
+
+
+cd ~/hpc/db/dbSNP153/mir
+panel="hsa.gff3"
+mkdir temp
+for i in {1..22} X Y
+do
+echo \#PBS -N $i  > $i.job
+echo \#PBS -l nodes=1:ppn=1 >> $i.job
+echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
+echo \#PBS -o $(pwd)/temp/ >>$i.job
+echo \#PBS -e $(pwd)/temp/ >>$i.job
+echo \#PBS -m abe  >> $i.job
+echo cd $(pwd) >> $i.job
+echo bcftools view -v snps -R ~/hpc/rheumatology/RA/meta3000/MIR/$panel.hg19.bed ~/hpc/db/dbSNP153/db153.chr$i.vcf.gz -Oz -o $i.db153.vcf.gz >>$i.job
+echo bcftools sort $i.db153.vcf.gz -Oz -o $i.db153.sort.vcf.gz >> $i.job
+echo bcftools view -m2 -M2 -v snps $i.db153.sort.vcf.gz -Oz -o $i.db153.$panel.vcf.gz >>$i.job
+qsub $i.job
+done
+
+for i in `ls *.db153.$panel.vcf.gz`
+do 
+bcftools query -f '%CHROM\t%POS\t%ID\n' $i | awk '{print $1,$2-1,$2,$3}' OFS="\t" >> miRNA.db153.hg19.bed 
+done
+
+sort -u miRNA.db153.hg19.bed> miRNA.db153.uni.hg19.bed
+
+mkdir temp
+for i in {1..22} X Y
+do
+echo \#PBS -N $i  > $i.job
+echo \#PBS -l nodes=1:ppn=1 >> $i.job
+echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
+echo \#PBS -o $(pwd)/temp/ >>$i.job
+echo \#PBS -e $(pwd)/temp/ >>$i.job
+echo \#PBS -m abe  >> $i.job
+echo cd $(pwd) >> $i.job
+echo plink --vcf ~/hpc/db/dbSNP153/dbSNP153.hg19.chr$i.vcf.vcf --make-bed --out ./plink/db153.chr$i >>$i.job
+qsub $i.job
+done
+
+
+cd ~/hpc/rheumatology/RA/meta3000/MIR/gnomad
+panel="hsa.gff3"
+mkdir temp
+for i in {1..22} X Y
+do
+echo \#PBS -N $i  > $i.job
+echo \#PBS -l nodes=1:ppn=1 >> $i.job
+echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
+echo \#PBS -o $(pwd)/temp/ >>$i.job
+echo \#PBS -e $(pwd)/temp/ >>$i.job
+echo \#PBS -m abe  >> $i.job
+echo cd $(pwd) >> $i.job
+echo bcftools view -m2 -M2 -v snps -f PASS -R ~/hpc/db/dbSNP153/miRNA.db153.uni.hg19.bed ~/hpc/db/Gnomad/genome/gnomad.genomes.r2.1.sites.chr$i.vcf.bgz -Oz -o gnomad.genomes.r2.1.chr$i.full.vcf.gz>>$i.job
+echo bcftools view -m2 -M2 -v snps -f PASS -i \'INFO/AF_eas\>0.01\' -R ~/hpc/db/dbSNP153/miRNA.db153.uni.hg19.bed ~/hpc/db/Gnomad/genome/gnomad.genomes.r2.1.sites.chr$i.vcf.bgz -Oz -o gnomad.genomes.r2.1.chr$i.common.vcf.gz>>$i.job
+qsub $i.job
+done
+
+rm miRNA.cESA.gnomad.full.hg19.bed 
+rm miRNA.cESA.gnomad.common.hg19.bed 
+for i in {1..22}
+do 
+bcftools query -f '%CHROM\t%POS\t%ID\n' gnomad.genomes.r2.1.chr$i.full.vcf.gz | awk '{print $1,$2-1,$2,$3}' OFS="\t" >> miRNA.cESA.gnomad.full.hg19.bed 
+bcftools query -f '%CHROM\t%POS\t%ID\n' gnomad.genomes.r2.1.chr$i.common.vcf.gz | awk '{print $1,$2-1,$2,$3}' OFS="\t" >> miRNA.cESA.gnomad.common.hg19.bed 
+done
+sort -u miRNA.cESA.gnomad.full.hg19.bed | wc -l 
+sort -u miRNA.cESA.gnomad.common.hg19.bed | wc -l  
+sort -u miRNA.cESA.gnomad.full.hg19.bed > miRNA.ESA.gnomad.full.uni.hg19.bed
+sort -u miRNA.cESA.gnomad.common.hg19.bed > miRNA.ESA.gnomad.common.uni.hg19.bed
+
+
+
+cd ~/hpc/rheumatology/RA/meta3000/MIR/GenomeAsia100K
+panel="hsa.gff3"
+mkdir temp
+for i in {1..22} X Y
+do
+echo \#PBS -N $i  > $i.job
+echo \#PBS -l nodes=1:ppn=1 >> $i.job
+echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
+echo \#PBS -o $(pwd)/temp/ >>$i.job
+echo \#PBS -e $(pwd)/temp/ >>$i.job
+echo \#PBS -m abe  >> $i.job
+echo cd $(pwd) >> $i.job
+echo bcftools view -m2 -M2 -v snps -f PASS -R ~/hpc/db/dbSNP153/miRNA.db153.uni.hg19.bed $i.GenomeAsia100K.norm.vcf.gz -Oz -o $i.GenomeAsia100K.norm.full.vcf.gz>>$i.job
+echo bcftools view -v snps -f PASS -i \'INFO/AF_SAS\>0.01 \&INFO/AF_SEA\>0.01\' -R ~/hpc/db/dbSNP153/miRNA.db153.uni.hg19.bed $i.GenomeAsia100K.norm.vcf.gz -Oz -o $i.GenomeAsia100K.common.vcf.gz >>$i.job
+qsub $i.job
+done
+
+full="miRNA.ESA.GenomeAsia100K.full.hg19.bed"
+common="miRNA.ESA.GenomeAsia100K.common.hg19.bed" 
+rm $full
+rm $common
+for i in {1..22}
+do 
+bcftools query -f '%CHROM\t%POS\t%ID\n' $i.GenomeAsia100K.full.vcf.gz | awk '{print $1,$2-1,$2,$3}' OFS="\t" >> $full
+bcftools query -f '%CHROM\t%POS\t%ID\n' $i.GenomeAsia100K.common.vcf.gz | awk '{print $1,$2-1,$2,$3}' OFS="\t" >> $common
+done
+sort -u $full | wc -l 
+sort -u $common | wc -l  
+sort -u $full  > $full.uni.bed
+sort -u $common  > $common.uni.bed
+
+
+
+
+cd ~/hpc/db/Gnomad/genome/
+panel="hsa.gff3"
+mkdir temp
+for i in {1..22} X Y
+do
+echo \#PBS -N $i  > $i.job
+echo \#PBS -l nodes=1:ppn=1 >> $i.job
+echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
+echo \#PBS -o $(pwd)/temp/ >>$i.job
+echo \#PBS -e $(pwd)/temp/ >>$i.job
+echo \#PBS -m abe  >> $i.job
+echo cd $(pwd) >> $i.job
+echo tabix -p vcf gnomad.genomes.r2.1.sites.chr$i.vcf.bgz >>$i.job
+qsub $i.job
+done
+
+
+
+rm miRNA.cESA.gnomad.full.hg19.bed 
+for i in `ls gnomad.genomes.r2.1.chr*.full.vcf.gz`
+do 
+bcftools query -f '%CHROM\t%POS\t%ID\n' $i | awk '{print $1,$2-1,$2,$3}' OFS="\t" >> miRNA.cESA.gnomad.full.hg19.bed 
+done
+wc -l miRNA.cESA.gnomad.full.hg19.bed 
+
+rm miRNA.cESA.gnomad.hg19.bed 
+for i in `ls gnomad.genomes.r2.1.chr*.hsa.gff3.vcf.gz`
+do 
+bcftools query -f '%CHROM\t%POS\t%ID\n' $i | awk '{print $1,$2-1,$2,$3}' OFS="\t" >> miRNA.cESA.gnomad.hg19.bed 
+done
+
+
+cd ~/hpc/rheumatology/RA/meta3000/MIR/GenomeAsia100K
+panel="hsa.gff3"
+mkdir temp
+for i in {1..22} X Y
+do
+echo \#PBS -N $i  > $i.job
+echo \#PBS -l nodes=1:ppn=1 >> $i.job
+echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
+echo \#PBS -o $(pwd)/temp/ >>$i.job
+echo \#PBS -e $(pwd)/temp/ >>$i.job
+echo \#PBS -m abe  >> $i.job
+echo cd $(pwd) >> $i.job
+echo bcftools view -v snps -f PASS -R ~/hpc/db/dbSNP153/miRNA.db153.uni.hg19.bed $i.GenomeAsia100K.norm.vcf.gz -Oz -o $i.GenomeAsia100K.full.vcf.gz >>$i.job
+echo bcftools view -v snps -f PASS -i \'INFO/AF_SAS\>0.01 \&INFO/AF_SEA\>0.01\' -R ~/hpc/db/dbSNP153/miRNA.db153.uni.hg19.bed $i.GenomeAsia100K.norm.vcf.gz -Oz -o $i.GenomeAsia100K.common.vcf.gz >>$i.job
+echo bcftools sort $i.GenomeAsia100K.common.vcf.gz -Oz -o $i.GenomeAsia100K.common.sort.vcf.gz >> $i.job
+echo bcftools view -m2 -M2 -v snps $i.GenomeAsia100K.common.sort.vcf.gz -Oz -o $i.GenomeAsia100K.$panel.vcf.gz >>$i.job
+qsub $i.job
+done
+
+
+rm miRNA.cESA.GenomeAsia100K.full.hg19.bed 
+for i in `ls *.GenomeAsia100K.full.vcf.gz`
+do 
+bcftools query -f '%CHROM\t%POS\t%ID\n' $i | awk '{print $1,$2-1,$2,$3}' OFS="\t" >> miRNA.cESA.GenomeAsia100K.full.hg19.bed 
+done
+wc -l miRNA.cESA.GenomeAsia100K.full.hg19.bed 
+
+
+rm miRNA.cESA.GenomeAsia100K.hg19.bed 
+for i in `ls *.GenomeAsia100K.hsa.gff3.vcf.gz`
+do 
+bcftools query -f '%CHROM\t%POS\t%ID\n' $i | awk '{print $1,$2-1,$2,$3}' OFS="\t" >> miRNA.cESA.GenomeAsia100K.hg19.bed 
+done
+
+
+
+
+
+####################################################################
+####################################################################
+## addfakegenotype.pl
+
+use strict;
+open F,shift @ARGV;
+while(<F>){
+chomp;
+my $line=$_;
+if(/^#CHROM/){
+print "$_\tFORMAT\tGSC001\n" if /^#/;
+}elsif(/^#/){
+print "$_\n" if /^#/;
+}else{
+print "$line\tGT\t0|1\n";
+}
+}
+
+####################################################################
+####################################################################
+## fastq2gz.pbs
+
+for $i in `ls SRS*.fasta.gz`
+do
+metaphlan2.py $f --input_type fasta --nproc 4 > $i\_profile.txt
+done
+
+DIR="/gpfs/home/guosa/hpc/tools/HUMAnN2"
+humann2_databases --download chocophlan full $DIR
+humann2_databases --download uniref uniref90_diamond $DIR
+humann2_databases --download utility_mapping full $DIR
+
+
+####################################################################
+####################################################################
+## fastq2gz.pbs
+for i in `ls *.fastq`
+do
+echo $i
+echo \#PBS -N $i > $i.job
+echo \#PBS -l nodes=1:ppn=1 >> $i.job
+echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
+echo \#PBS -m abe  >> $i.job
+echo cd $(pwd) >> $i.job
+echo gzip -c $i \> $i.gz >>$i.job
+qsub  $i.job
+done
+
+#########################################################################################################
+##### How to do download and trim dbSNP153  ###########
+#########################################################################################################
+## 02/16/2020
+wget https://ftp.ncbi.nih.gov/snp/redesign/latest_release/VCF/GCF_000001405.25.gz
+wget https://ftp.ncbi.nih.gov/snp/redesign/latest_release/VCF/GCF_000001405.25.gz.tbi
+wget https://raw.githubusercontent.com/Shicheng-Guo/AnnotationDatabase/master/GCF_000001405.25_GRCh37.p13_assembly_report.txt
+awk -v RS="(\r)?\n" 'BEGIN { FS="\t" } !/^#/ { if ($10 != "na") print $7,$10; else print $7,$5 }' GCF_000001405.25_GRCh37.p13_assembly_report.txt > dbSNP-to-UCSC-GRCh37.p13.map
+perl -p -i -e '{s/chr//}' dbSNP-to-UCSC-GRCh37.p13.map
+bcftools annotate --rename-chrs dbSNP-to-UCSC-GRCh37.p13.map GCF_000001405.25.gz | gawk '/^#/ && !/^##contig=/ { print } !/^#/ { if( $1!="na" ) print }' | bgzip -c > dbSNP153.hg19.vcf.gz
+
+
+wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/liftOver
+wget http://hgdownload.soe.ucsc.edu/goldenPath/hg18/liftOver/hg18ToHg19.over.chain.gz
+wget http://hgdownload.soe.ucsc.edu/goldenPath/hg19/liftOver/hg19ToHg38.over.chain.gz
+wget http://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/hg38ToHg19.over.chain.gz
+gunzip hg18ToHg19.over.chain.gz
+gunzip hg19ToHg38.over.chain.gz
+gunzip hg38ToHg19.over.chain.gz
+
+liftOver hsa.gff3.hg38.bed hg38ToHg19.over.chain hsa.gff3.hg19.bed unmap
+
+#################### hg38 ########################################
+wget https://ftp.ncbi.nih.gov/snp/redesign/latest_release/VCF/GCF_000001405.38.gz
+wget https://ftp.ncbi.nih.gov/snp/redesign/latest_release/VCF/GCF_000001405.38.gz.tbi
+#########################################################################################################
+##### meta-analysis to RA1000 and RA500 ###########
+#########################################################################################################
+## 02/04/2020
+source("https://raw.githubusercontent.com/Shicheng-Guo/GscRbasement/master/cminput2bed.R")
+
+cd /gpfs/home/guosa/hpc/rheumatology/RA/RA1000/michigan/
+plink --bfile --maf 0.01  RA1000.beagle --allow-no-sex --logistic --threads 31 --covar plink.eigenvec --ci 0.95 --covar-number 1-4 --adjust --out RA1000.beagle
+
+cd ~/hpc/rheumatology/RA/RA500/michigan/
+plink --bfile --maf 0.01 RA500.beagle --allow-no-sex --logistic --threads 31 --covar plink.eigenvec --ci 0.95 --covar-number 1-4 --adjust --out RA500.beagle
+
+cd ~/hpc/rheumatology/RA/
+plink --meta-analysis ~/hpc/rheumatology/RA/RA1000/michigan/RA1000.beagle.assoc.logistic  ~/hpc/rheumatology/RA/RA500/michigan/RA500.beagle.assoc.logistic --out RA3000
+
+setwd("~/hpc/rheumatology/RA/")
+library("CMplot")
+source("http://raw.githubusercontent.com/Shicheng-Guo/RobustSKAT/master/R/qqplotsource.R")
+input<-read.table("RA3000.meta",head=T,as.is=T,check.names=F)
+memo="RA3000"
+Chromosome<-input$CHR
+Position<-input$BP
+SNP<-input$SNP
+P<-input$P
+cminput<-na.omit(data.frame(SNP,Chromosome,Position,trait1=P))
+CMplot(cminput,plot.type="b",memo=paste(memo,".fix",sep=""),LOG10=TRUE,threshold=NULL,file="jpg",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
+qqplot(cminput$trait1,memo)
+cminput<-cminput[order(cminput[,4],decreasing=F),]
+write.csv(cminput,file=paste(memo,"fixed.cminput.csv",sep=""),quote=F,row.names=F)
+TOP<-head(cminput,n=5500)
+cminput2bed(TOP,memo="RA3000TOP")
+bedtools intersect -wao -a RA3000TOP.bed -b ~/hpc/db/hg19/refGeneExtent.hg19.bed | grep -v '\-1' | grep -v 'chr6' | awk '{print $11}' | sort -u  > RA3000TOP.refGene.txt
+cminput2bed<-function(cminput,memo){
+CHR=paste("chr",cminput$Chromosome,sep="")
+START=paste(cminput$Position-1)
+END=paste(cminput$Position)
+SNP=paste(cminput$SNP)
+P=paste(cminput$trait1)
+bed<-data.frame(CHR,START,END,SNP,P)
+filename=paste(memo,".bed",sep="")
+write.table(bed,file=filename,quote=F,col.names=F,row.names=F,sep="\t")
+}
+write.table(TOP,file=paste(memo,"top5500.fixed.cminput.txt",sep=""),quote=F)
+
+
+
+setwd("~/hpc/rheumatology/RA/")
+library("CMplot")
+source("http://raw.githubusercontent.com/Shicheng-Guo/RobustSKAT/master/R/qqplotsource.R")
+input<-read.table("/home/guosa/hpc/rheumatology/RA/RA500/michigan/RA500.beagle.assoc.logistic",head=T,check.names=F,as.is=T)
+memo="RA500"
+Chromosome<-input$CHR
+Position<-input$BP
+SNP<-input$SNP
+P<-input$P
+cminput<-na.omit(data.frame(SNP,Chromosome,Position,trait1=P))
+CMplot(cminput,plot.type="b",memo=paste(memo,".fix",sep=""),LOG10=TRUE,threshold=NULL,file="jpg",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
+qqplot(cminput$trait1,memo)
+cminput<-cminput[order(cminput[,4],decreasing=F),]
+write.csv(cminput,file=paste(memo,".cminput.csv",sep=""),quote=F,row.names=F)
+head(cminput)
+
+
+setwd("~/hpc/rheumatology/RA/")
+library("CMplot")
+source("http://raw.githubusercontent.com/Shicheng-Guo/RobustSKAT/master/R/qqplotsource.R")
+input<-read.table("/home/guosa/hpc/rheumatology/RA/RA1000/michigan/RA1000.beagle.assoc.logistic",head=T,check.names=F,as.is=T)
+memo="RA1000"
+Chromosome<-input$CHR
+Position<-input$BP
+SNP<-input$SNP
+P<-input$P
+cminput<-na.omit(data.frame(SNP,Chromosome,Position,trait1=P))
+CMplot(cminput,plot.type="b",memo=paste(memo,".fix",sep=""),LOG10=TRUE,threshold=NULL,file="jpg",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
+qqplot(cminput$trait1,memo)
+cminput<-cminput[order(cminput[,4],decreasing=T),]
+write.csv(cminput,file=paste(memo,".cminput.csv",sep=""),quote=F,row.names=F)
+head(cminput)
+
+
+for input in MUC PADI CSF PTPN PLD DNMT TET ZNF MIR MAP GRI FOX IRF ST TTC COL GTF IL7
+awk '{print $3,$5,$6,$4,$2,$13}' OFS="\t" refGene.txt > ~/hpc/db/hg19/refGene.hg19.fancylocal.bed
+cd ~/hpc/rheumatology/RA/meta3000
+input="BEND5"
+mkdir $input
+cd $input
+grep -w "BEND5" ~/hpc/db/hg19/refGene.hg19.V2.bed.txt | awk '{print $1,$2-50000,$3+50000,$5}' OFS="\t" | sort -u | bedtools sort -i > ROI.hg19.bed
+
+plink --bfile ~/hpc/rheumatology/RA/RA1000/michigan/RA1000.beagle --extract range ROI.hg19.bed --make-bed --out ROI.dbsnp
+wget https://raw.githubusercontent.com/Shicheng-Guo/GscRbasement/master/manhattan.qqplot.R -O manhattan.plot.R
+wget https://raw.githubusercontent.com/Shicheng-Guo/GscRbasement/master/make.fancy.locus.plot.unix.R -O make.fancy.locus.plot.unix.R
+wget https://raw.githubusercontent.com/Shicheng-Guo/Gscutility/master/localhit.pl -O localhit.pl
+
+#############################################################################
+plink --bfile ROI.dbsnp --recode vcf --out ROI
+bcftools view ROI.vcf -Oz -o ROI.vcf.gz
+tabix -p vcf ROI.vcf.gz
+bcftools annotate -a ~/hpc/db/hg19/refGene.hg19.VCF.sort.bed.gz -c CHROM,FROM,TO,GENE -h <(echo '##INFO=<ID=GENE,Number=1,Type=String,Description="Gene name">') ROI.vcf.gz -Ov -o ROI.refGene.vcf
+#############################################################################
+touch readme.md
+echo  "### Novel Genetic susceptibility loci in" $input "associated with rheumatoid arthritis" > readme.md
+touch readme.txt
+bcftools view -G ROI.refGene.vcf -Ov -o ROI.refGene.vcf.txt
+echo  "Title: Novel Genetic susceptibility loci in" $input "associated with seropositive rheumatoid arthritis" > readme.txt
+echo "" >> readme.txt
+plink --bfile ROI.dbsnp --hardy --out ROI
+echo  "ROI.hwe: Hardy-Weinberg test statistics for each SNP for" $input. "SNPs in control group should not signficant which means P should higher than 0.05 or 0.01. this table will be put to supplementary table" >> readme.txt
+plink --bfile ROI.dbsnp --logistic --hwe 0.01 --adjust --ci 0.95 --out ROI
+echo  "ROI.assoc.logistic: logistic based case-control test for" $input. "default style is to test additive model --ADD-- in logistic regression. this file will be one of most important table in the manuscript" >> readme.txt
+echo  "ROI.assoc.logistic.adjusted: this file include all the multiple-test corrected P-value for each SNPs in" $input. " When you prepare the manuscript, this file should be integrate with above file --ROI.assoc.logistic--" >> readme.txt
+plink --bfile ROI.dbsnp --assoc --counts --adjust --ci 0.95 --out ROI
+echo  "ROI.assoc: Chi-square based case-control test for" $input. "this file will be one of most important table in the manuscript since it showed the number of alleles in case and control" >> readme.txt
+echo  "ROI.assoc.adjusted: this file include all the multiple-test corrected P-value --in the file: ROI.assoc-- for each SNPs in" $input. " When you prepare the manuscript, this file should be integrate with above file --ROI.assoc--" >> readme.txt
+plink --bfile ROI.dbsnp --fisher --counts --adjust --ci 0.95 --out ROI
+echo  'ROI.assoc.fisher: Fisher exact test based case-control association between SNPs and RA. This file will be useful when any cell lt 5. Usually when certain cell have number lt 5, we report fisher P-value not Chi-square P-value' >> readme.txt
+echo  "ROI.assoc.fisher.adjusted: this file include all the multiple-test corrected P-value --in the file: ROI.assoc-- for each SNPs in" $input. " When you prepare the manuscript, this file should be integrate with above file --ROI.assoc--" >> readme.txt
+plink --bfile ROI.dbsnp --model fisher --ci 0.95 --out ROI
+echo  "ROI.model: Fisher's exact test based case-control association with different models for" $input. "this file is one of most important table in the manuscript" >> readme.txt
+plink --bfile ROI.dbsnp --logistic --dominant --ci 0.95 --out ROI.dominant
+echo  "ROI.dominant.assoc.logistic: logistic regression based association in dominant models for" $input. "this file is one of most important table in the manuscript. In the file of ROI.model, the DOM is based on fisher's exact test" >> readme.txt
+plink --bfile ROI.dbsnp --logistic --recessive --ci 0.95 --out ROI.recessive
+echo  "ROI.recessive.assoc.logistic: logistic regression based association in recessive models for" $input. "this file is one of most important table in the manuscript" >> readme.txt
+~/hpc/tools/plink-1.07-x86_64/plink --bfile ROI.dbsnp --hap-window 2,3,4,5,6 --hap-assoc --out haplotype --noweb
+echo  'haplotype.assoc.hap: chi-square test based haplotype association. This file is important which can be shown with significant haplotype as a table in the manuscript' >> readme.txt
+awk '$6=="NMISS"{print}' ROI.assoc.logistic > ROI.assoc.logistic.add
+awk '$5=="ADD"{print}' ROI.assoc.logistic >> ROI.assoc.logistic.add
+
+sort -k12n,12 ROI.assoc.logistic | head -n 3
+sort -k12n,12 ROI.assoc.logistic | tail -n 3
+
+rs="rs1934409"
+chr=1
+grep $rs ROI.assoc.logistic
+plink --bfile ~/hpc/rheumatology/RA/RA1000/michigan/RA1000.beagle --snp $rs --recode --out $rs
+plink --bfile ~/hpc/rheumatology/RA/RA1000/michigan/RA1000.beagle --threads 31 --r2 --ld-snp $rs --ld-window-kb 100 --ld-window 99999 --ld-window-r2 0 --out $rs
+perl localhit.pl $rs > $rs.local
+head  $rs.local
+Rscript make.fancy.locus.plot.unix.R $rs $rs $chr $rs.local 6 0.05
+
+
+
+rm *.R
+rm *.pl
+echo "" >> readme.txt
+echo  'Abstract: The heritability of RA has been shown from twin studies to be 60%. Since 2007, rapid advances in technology underpinning the use of genome-wide association studies have allowed the identification of hundreds of genetic risk factors for many complex diseases. There are now >100 genetic loci that have been associated with RA. In the previous study, the contribution of HLA to heritability has been estimated to be 11–37% while 100 non-HLA loci were shown to explain 4.7% of the heritability of RA in Asians. The majority of the heritability is still missing.' $input ' have xxxxxx function which might be invovled in  pathology of RA. therefore, In this study, we conducted assocation study to investigate the role of xx and its paralog genes and in RA. in the first stage, we colllected 1078 seropositive RA and 1045 matched control. xxx SNPs in xx, xxx, xxx, xx were genotyped. We found SNPs rsxxx in xxx was signifciantly associated with RA, P=xxx, 95%CI.' >> readme.txt
+echo "Run title:" $rs "in" $input "and Seropositive Rheumatoid Arthritis" >> readme.txt
+echo "Reference: https://github.com/CNAID/Publication/blob/master/2018/1-s2.0-S155608641830090X-main.pdf" >>readme.txt
+echo "Reference: https://github.com/CNAID/Publication/blob/master/2019/nejmoa18015622019.pdf" >>readme.txt
+
+
+wget https://raw.githubusercontent.com/Shicheng-Guo/ASA/master/UKBiobank_PheWAS_M05.txt
+wget https://raw.githubusercontent.com/Shicheng-Guo/ASA/master/UKBiobank_PheWAS_M06.txt
+wget https://raw.githubusercontent.com/Shicheng-Guo/ASA/master/UKBiobank_PheWAS_20002_1464.txt
+zcat M05.assoc.tsv.gz | awk '$9<4.7e-3{print}' > M05.assoc.diff
+zcat M06.assoc.tsv.gz | awk '$9<4.7e-3{print}' > M06.assoc.diff
+zcat 20002_1464.assoc.tsv.gz | awk '$9<4.7e-3{print}' > 20002_1464.assoc.diff
+awk '{print $2}'  M05.assoc.diff > RA.pheWAS.txt
+awk '{print $2}'  M06.assoc.diff >> RA.pheWAS.txt
+awk '{print $2}'  20002_1464.assoc.diff >> RA.pheWAS.txt
+sort -u RA.pheWAS.txt > RA.pheWAS.uni.txt
+
+wget https://raw.githubusercontent.com/Shicheng-Guo/ASA/master/RA.pheWAS.uni.txt -O RA.pheWAS.uni.txt
+wc -l RA.pheWAS.uni.txt
+plink --bfile RA2020-B8.dbsnp --extract RA.pheWAS.uni.txt --assoc --counts --adjust --ci 0.95 --out pheWAS
+awk '$1 !=6 && $3<0.05{print}' pheWAS.assoc.adjusted
+
+
+
+
+#########################################################################################################
+##### RNA-seq data to reveal novel response mechanism to bacterial within host wound tissues ###########
+#########################################################################################################
+## 02/04/2020
+https://github.com/Shicheng-Guo/HowtoBook/tree/master/APP/macs2/ChIP-Seq-Slides-Shicheng-Guo-2020-MACS2.pdf	
+https://github.com/Shicheng-Guo/HowtoBook/tree/master/APP/macs2/ENCODE 3 - ChIPSeq Pipeline - Google Docs.pdf	
 ls ./*/step_5_output/*/*merged.RefSeq_annot_function.tsv
 ls ./*/step_5_output/RefSeq_results/*erged.RefSeq_annot_organism.tsv
 
@@ -112,6 +752,8 @@ plink --bfile RA2020-B8 --assoc --adjust gc --threads 31  --ci 0.95  --out RA500
 
 
 /gpfs/home/guosa/hpc/tools/RSEM_tutorial/software/RSEM-1.2.25
+
+--snps-only ['just-acgt']
 
 #### plink2vcf and Michigan imputation
 cd ~/hpc/rheumatology/RA/RA500
@@ -669,9 +1311,12 @@ GATCGGAAGAGCACACGTCTGAACTCCAGTCACATTCCTTTATCTCGTATGCCGTCTTCTGCTTG
 
 
 #################################################################################################################################
+wget https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh
+bash Miniconda2-latest-Linux-x86_64.sh
 
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
+
 ./bin/salmon index -t transcripts.fa -i transcripts_index --decoys decoys.txt -k 31
 cd ~/hpc/project/RnaseqBacterial/extdata/sra
 fastq_screen --subset 0  --force --threads 12 --conf  ~/hpc/tools/fastq_screen_v0.14.0/FastQ_Screen_Genomes/fastq_screen.conf SRR10838781_1.fastq.gz SRR10838781_2.fastq.gz --outdir ../fastqscreen/
@@ -956,9 +1601,14 @@ git init
 git add README.md
 git commit -m "project start"
 
+scp -r cv /home/nu_guos/ResearchCareer
+
 git remote add origin git@github.com:username/new_repo
 
 git push -u origin master
+
+shicheng.guo@hotmail.com
+
 
 git remote add origin https://github.com/Shicheng-Guo/kegg
 
@@ -2907,6 +3557,7 @@ for i in 2019032901 2019032903 2019040901 2019051703 2019052301 2019053101 20190
 do
 intervene venn -i $i*.bed --project $i.pancan.promoterEnhancaer
 done
+
 
 
 ###################################################################################################
@@ -8842,8 +9493,6 @@ done
 
 
 tabix -p vcf ALL.chr4.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz 4:10005-10494
-
-
 ALL.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf
 
 
@@ -10139,10 +10788,9 @@ convert_bim_allele.pl old.bim hh550_610.snptable -outfile new.bim -intype top -o
 tabix FinalRelease_phase1.vcf.gz 6:31323299-32165371
 
 
-1       exm9324 0       6504575 0       G
-1:6504575
 
 
+wget https://raw.githubusercontent.com/Shicheng-Guo/Gscutility/master/rs2bed.pl -O rs2bed.pl
 echo rs2bed.pl ASD.hg19.avinput | qsub -N 'ASD'
 cd /gpfs/home/guosa/hpc/rheumatology/SSc/CCHCR1/1000G
 cd /gpfs/home/guosa/hpc/rheumatology/RA/NatureCommunication/snp150
@@ -12985,19 +13633,19 @@ wget https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE29127&format=file
 wget ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE1nnn/GSE1000/suppl/GSE1000_RAW.tar  
 
 mkdir ../methyfreq
-option1=$(echo --no_overlap --merge_non_CpG --cutoff 1 --multicore 5 --paired-end)
+option1=$(echo --no_overlap --merge_non_CpG --cutoff 5 --multicore 5 --paired-end)
 option2=$(echo --bedGraph --ignore 1 --buffer_size 4G --gzip --comprehensive)
 
-for i in `ls Pool_*bam`
+for i in `ls *bam`
 do
 echo \#PBS -N $i  > $i.job
 echo \#PBS -l nodes=1:ppn=16 >> $i.job
-echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
 echo \#PBS -m abe  >> $i.job
 echo \#PBS -q longq  >> $i.job
-echo cd /gpfs/home/guosa/hpc/nash/bam/pool/bam >> ${i}.job
-echo bismark_methylation_extractor ${option1} ${option2} --output ../methyfreq  ./$i >> ${i}.job
-echo ${i}.job
+echo cd /gpfs/home/guosa/hpc/project/nash/bam >> $i.job
+echo bismark_methylation_extractor ${option1} ${option2} --output ../methyfreq  ./$i >> $i.job
+echo $i.job
+qsub $i.job
 done
 
 mkdir ../methyfreq
@@ -13014,28 +13662,6 @@ echo cd /gpfs/home/guosa/hpc/nash/bam/ >> ${i}.job
 echo bismark_methylation_extractor ${option1} ${option2} --output ../methyfreq  ./$i >> ${i}.job
 echo ${i}.job
 done
-
-
-
-
-qsub Pool_A-plasma_S1_L001_R1_001.bam.job
-qsub Pool_B-plasma_S2_L001_R1_001.bam.job
-qsub Pool_C-plasma_S3_L001_R1_001.bam.job
-
-qsub Pool_A-tissue_S4_L002_R1_001.nsort.bam.job
-qsub Pool_B-tissue_S5_L002_R1_001.nsort.bam.job
-qsub Pool_C-tissue_S6_L002_R1_001.nsort.bam.job
-
-
-Pool_A-plasma_S1_L001_R1_001.nsort.bam.job
-mv Pool_B-plasma_S2_L001_R1_001re.nsort.bam.job Pool_B-plasma_S2_L001_R1_001.bam.job 
-mv Pool_C-plasma_S3_L001_R1_001re.nsort.bam.job Pool_C-plasma_S3_L001_R1_001.bam.job
-mv Pool_C-plasma_S3_L001_R1_001re.nsort.bam Pool_C-plasma_S3_L001_R1_001.bam
-mv Pool_B-plasma_S2_L001_R1_001re.nsort.bam Pool_B-plasma_S2_L001_R1_001.bam
-mv Pool_A-plasma_S1_L001_R1_001.nsort.bam Pool_A-plasma_S1_L001_R1_001.bam
-mv Pool_A-tissue_S4_L002_R1_001.nsort.bam Pool_A-tissue_S4_L002_R1_001.bam
-mv Pool_B-tissue_S5_L002_R1_001.nsort.bam Pool_B-tissue_S5_L002_R1_001.bam
-mv Pool_C-tissue_S6_L002_R1_001.nsort.bam Pool_C-tissue_S6_L002_R1_001.bam
 
 
 mkdir ../mf
@@ -13083,24 +13709,12 @@ echo samtools sort -n -@ 6 $i $j.nsort >> ${i}.job
 echo $i.job
 done
 
-
-
 #qsub $i.job
 echo coverage2cytosine --merge_CpG ../methyfreq/ --genome_folder $BismarkRefereDb -o ../methyfreq/$j >> ${i}.job
 
-
-
-
-
 bismark_methylation_extractor --no_overlap --merge_non_CpG --cutoff 1 --multicore 5 --paired-end --bedGraph --ignore 1 --buffer_size 4G --comprehensive --output ../methyfreq /home/shg047/luministuscdata/Pool_B-tissue_S5_L002_R1_001.bam
-
 bismark_methylation_extractor --no_overlap --merge_non_CpG --cutoff 1 --multicore 5 --paired-end --bedGraph --ignore 1 --buffer_size 4G --comprehensive --output ./Pool_B-tissue_S5_L002_R1_001.bam
-
 samtools sort -n
-
-
-
-
 
 Genome-wide DNA methylation mapping in breast cancer cells (HCC1954) and normal breast cells (HMEC)
 Design: MethylC-Seq on breast cancer HCC1954 and normal breast HMEC. 100 cycles of sequencing on Illumina platform.
@@ -14181,7 +14795,12 @@ scp -o 'ProxyCommand ssh nu_guos@submit-3.chtc.wisc.edu nc %h %p' shg047@23.99.1
 
 fastqc_v0.11.7.zip
 
- scp nu_guos@submit-3.chtc.wisc.edu:/home/nu_guos/tools/bowtie2-2.3.4.1-linux-x86_64.zip
+ scp nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/tools/bowtie2-2.3.4.1-linux-x86_64.zip
+ 
+ scp nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/nash/* 
+ 
+ 
+ 
  scp nu_guos@submit-3.chtc.wisc.edu:/home/nu_guos/tools/*.zip
  scp nu_guos@submit-3.chtc.wisc.edu:/home/nu_guos/tools/*.bz2
  scp nu_guos@submit-3.chtc.wisc.edu:/home/nu_guos/tools/*.gz
@@ -16081,7 +16700,7 @@ perl ../../../../bin/R2matrix.pl > plan3.R2.txt
  echo "#PBS -m abe" >> $i.bam2mf.job
  echo "#PBS -A k4zhang-group" >> $i.bam2mf.job
  echo "cd $(pwd)" >> $i.bam2mf.job
- echo bismark_methylation_extractor --single-end --bedGraph --cutoff 1 --ignore 1 --buffer_size 4G --comprehensive --output ../methyfreq  ../sortBam/$i >> $i.bam2mf.job; 
+ echo bismark_methylation_extractor --single-end --bedGraph --cutoff 5 --ignore 1 --buffer_size 4G --comprehensive --output ../methyfreq  ../sortBam/$i >> $i.bam2mf.job; 
  qsub $i.bam2mf.job
  done
  
