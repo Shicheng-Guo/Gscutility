@@ -2,39 +2,37 @@
 use strict;
 use Cwd;
 my $dir = getcwd;
-chdir "/home/guosa/hpc/db/hg19/fa";
+chdir $dir;
 
-my $file=shift @ARGV;
-my %chrosome;
-my %cpgsnp;
+my $snp="/home/local/MFLDCLIN/guosa/hpc/db/hg19/allsnp150.hg19";
+my $cpg="/home/local/MFLDCLIN/guosa/hpc/db/hg19/fa/chr6.CpG.positions.txt";
 
-open F,$file;
-my $chr=split/\./,$file;
-my $line;
-while(<F>){
-	next if />/;
-	chomp;
-	$line.=$_;
-}
-my @line=split //,$line;
+open F1,"$snp";
+open F2,"$cpg";
 
-my $bim="FinalRelease_QC_20140311_Team1_Marshfield.bim";
+my %snp;
+my %cpg;
 
-open F1,"$bim";
+open OUT, "> CpGSNP.txt";
 while(<F1>){
 	chomp;
-	my $cpgsnp=$_;
-	my($chroms,$rs,undef,$pos,$ref,$alt)=split/\s+/;
-	next if $chroms!=$chr;
-	next if length($ref)>1;
-	next if length($alt)>1;
-    if("$ref$alt"=~/C/ && $line[$pos+1]=="G"){
-      	$cpgsnp{$cpgsnp}= $cpgsnp;
-    }elsif("$ref$alt"=~/G/ && $line[$pos-1]=="C"){
-      	$cpgsnp{$cpgsnp}= $cpgsnp;
-    }
+	my($chr,$pos,undef,$rs,undef)=split/\s+/;
+    $snp{"$chr:$pos"}=$rs;	
 }
-foreach my $cpgsnp(sort keys %cpgsnp){
-	print "$cpgsnp{$cpgsnp}\n";
+
+while(<F2>){
+	chomp;
+	my($chr,$pos)=split/\s+/;
+    $cpg{"$chr:$pos"}="$chr:$pos";	
 }
-print "Print CpG-SNP completed......\n";
+
+foreach my $pos(keys %snp){
+if ($cpg{$pos}){
+my($chr,$bp)=split /:/,$pos;
+print OUT "$chr\t$pos\t$snp{$bp}\n";
+print "$pos\t$snp{$pos}\n";
+}
+}
+
+close OUT
+
