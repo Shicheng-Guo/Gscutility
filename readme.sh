@@ -1,3 +1,59 @@
+####################################################################################################################
+####################################################################################################################
+# download gnomad
+use strict;
+use Cwd;
+chdir getcwd;
+open F,shift @ARGV;
+my $i=1;
+while(<F>){
+next if !/ZS/;
+my($snp,$sam,$rs,$gc,$chr,$pos,$a1,$a2,undef)=split/\s+/;
+print "$sam\t$sam\t0\t0\t0\t0\t$a1\t$a2\n";
+$i++;
+}
+
+use strict;
+use Cwd;
+chdir getcwd;
+open F,shift @ARGV;
+while(<F>){
+next if !/ZS/;
+my($snp,$sam,$rs,$gc,$chr,$pos,$a1,$a2,undef)=split/\s+/;
+print "$chr\t$rs\t0$pos\n";
+}
+
+for i in `ls *.txt | rev | cut -c 17- | rev | uniq`
+do
+echo $i
+perl ./fr2plink.pl $i\_FinalReport.txt > $i.ped
+done
+
+for i in `ls *.txt | rev | cut -c 17- | rev | uniq`
+do
+echo $i
+perl ./fr2plink.pl $i\_FinalReport.txt > $i.map
+done
+
+
+fr2plink.pl
+fr2map.pl
+
+rm all_my_files.txt
+for i in `ls *.txt | rev | cut -c 17- | rev | uniq`
+do
+echo $i >> all_my_files.txt
+done
+
+plink --file myfile1 --bmerge-list all_my_files.txt --make-bed --out mymerged
+
+
+
+
+
+####################################################################################################################
+####################################################################################################################
+# download gnomad
 remote connect to 
 Set-Location \\mcrfnas2\bigdata\Genetic\Projects\shg047\tcga\brafv600e
 C:\Admin\gdc-client.exe download --manifest gdc_manifest.2020-02-25.txt
@@ -15,6 +71,9 @@ find . -name "*.e*" -type 'f' -delete
 find . -name "*.o*" -type 'f'  -delete
 find . -name "*.job*" -type 'f'  -delete
 find . -name "*" -type 'f' -size +15000k print
+
+find . -name "*.job*" -type 'f' -size 0k 
+
 
 scp -r db/* nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/AnnotationDatabase/
 scp -r methylation nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/methylation
@@ -5559,12 +5618,12 @@ zcat chr22.dose.contig.vcf.gz | head -n 500 | bgzip -c > x.vcf.gz
 
 snpsift annotate -id ~/hpc/rheumatology/RA/he2019/imphase/dbSNP152.GSC.hg19.vcf x.vcf.gz
 
- alias snpsift="java -jar ~/hpc/tools/snpEff/SnpSift.jar"
+alias snpsift="java -jar ~/hpc/tools/snpEff/SnpSift.jar"
+alias ll="ls -larth"
 
- 
 /gpfs/home/guosa/hpc/rheumatology/RA/he2020/impute/R3/test
 
-  cp /gpfs/home/guosa/hpc/rheumatology/RA/he2019/imphase/dbSNP152.GSC.hg19.vcf ~/hpc/db/hg19 &
+cp /gpfs/home/guosa/hpc/rheumatology/RA/he2019/imphase/dbSNP152.GSC.hg19.vcf ~/hpc/db/hg19 &
   
 
 To change the SNP name, you need a list with all SNPs available.
