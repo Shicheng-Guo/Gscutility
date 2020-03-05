@@ -1,3 +1,43 @@
+/data/exome
+
+wget https://github.com/samtools/bcftools/releases/download/1.10.2/bcftools-1.10.2.tar.bz2
+wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2
+wget https://github.com/samtools/htslib/releases/download/1.10.2/htslib-1.10.2.tar.bz2
+
+tar xjvf htslib-1.10.2.tar.bz2
+./configure --disable-bz2 --disable-lzma
+./make --disable-bz2 --disable-lzma
+
+scp *.vcf.gz root@101.133.145.142:/data/exome
+
+http://www.ebi.ac.uk/gwas/summary-statistics/docs
+
+
+wget https://www.cog-genomics.org/static/bin/plink/glist-hg19 -O glist-hg19
+wget https://www.cog-genomics.org/static/bin/plink/glist-hg38
+perl -p -i -e 's/ /\t/g' glist-hg19
+perl -p -i -e 's/ /\t/g' glist-hg38
+
+grep '\bIL4\b' glist-hg19 > IL4.fly
+
+plink --bfile IL4 --pheno IL4.phen --mpheno 2 --maf 0.01 --assoc --allow-no-sex --make-set glist-hg19 --set-names "IL4" --make-set-border 5 --adjust
+
+library("CMplot")
+source("http://raw.githubusercontent.com/Shicheng-Guo/RobustSKAT/master/R/qqplotsource.R")
+input<-read.table("plink.qassoc",head=T,as.is=T,check.names=F)
+memo="IL4"
+Chromosome<-input$CHR
+Position<-input$BP
+SNP<-input$SNP
+P<-input$P
+cminput<-data.frame(SNP,Chromosome,Position,P)
+colnames(cminput)=c("SNP","Chromosome","Position","trait1")
+CMplot(cminput,plot.type="b",memo="IL4",LOG10=TRUE,threshold=NULL,file="jpg",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
+write.csv(cminput,file="IL4.csv",quote=F,row.name=F,col.names=T)
+
+awk '$1>0{print $1,$3-1,$3,$2,$5,$9}' OFS="\t" plink.qassoc | grep -v NA > plink.qassoc.hg19.bed
+
+####################################################################################################################
 wget https://raw.githubusercontent.com/Shicheng-Guo/miRNA-RA/master/db/hsa.gff.hg19.bed -O hsa.gff3.hg38.bed 
 wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/liftOver -O liftOver
 wget http://hgdownload.soe.ucsc.edu/goldenPath/hg18/liftOver/hg18ToHg19.over.chain.gz -O hg18ToHg19.over.chain.gz
@@ -474,7 +514,7 @@ find . -name "*.o*" -type 'f'  -delete
 find . -name "*.job*" -type 'f'  -delete
 find . -name "*" -type 'f' -size +15000k print
 
-find . -name "*.job*" -type 'f' -size 0k 
+find . -name "*.*" -type 'f' -size 0k 
 
 
 scp -r db/* nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/AnnotationDatabase/
