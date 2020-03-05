@@ -26,17 +26,17 @@ print "$chr\t$rs\t0$pos\n";
 for i in `ls *.txt | rev | cut -c 17- | rev | uniq`
 do
 echo $i
-perl ./fr2plink.pl $i\_FinalReport.txt > $i.ped
+perl ./fr2ped.pl $i\_FinalReport.txt > $i.ped
 done
 
 for i in `ls *.txt | rev | cut -c 17- | rev | uniq`
 do
 echo $i
-perl ./fr2plink.pl $i\_FinalReport.txt > $i.map
+perl ./fr2map.pl $i\_FinalReport.txt > $i.map
 done
 
 
-fr2plink.pl
+fr2ped.pl
 fr2map.pl
 
 rm all_my_files.txt
@@ -44,12 +44,18 @@ for i in `ls *.txt | rev | cut -c 17- | rev | uniq`
 do
 echo $i >> all_my_files.txt
 done
-
-plink --file myfile1 --bmerge-list all_my_files.txt --make-bed --out mymerged
-
+grep -v ZS10 all_my_files.txt > all_files.txt
 
 
 
+for i in `ls *.txt | rev | cut -c 17- | rev | uniq`
+do
+plink --file $i --exclude IL4-merge.missnp --make-bed --out $i
+done
+
+plink --bfile ZS10 --merge-list allfiles.txt --make-bed --out IL4
+
+5	131997408	132025990	IL4
 
 ####################################################################################################################
 ####################################################################################################################
