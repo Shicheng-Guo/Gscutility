@@ -37,6 +37,17 @@ write.csv(cminput,file="IL4.csv",quote=F,row.name=F,col.names=T)
 
 awk '$1>0{print $1,$3-1,$3,$2,$5,$9}' OFS="\t" plink.qassoc | grep -v NA > plink.qassoc.hg19.bed
 
+bedtools intersect -wao -a plink.qassoc.hg19.bed -b glist-hg19 | grep -v 
+
+wget https://www.cog-genomics.org/static/bin/plink/glist-hg19 -O glist-hg19
+wget https://www.cog-genomics.org/static/bin/plink/glist-hg38 -O glist-hg38
+awk '{print $1,$2-5000,$3+5000,$4}' OFS="\t" glist-hg19 > glist-hg19.5k.bed
+awk '{print $1,$2-5000,$3+5000,$4}' OFS="\t" glist-hg38 > glist-hg38.5k.bed
+
+bedtools intersect -wao -a plink.qassoc.hg19.bed -b glist-hg19.5k.bed | grep -v '\-1' | awk '{print $1,$2,$3,$4,$5,$6,$10}' OFS="," > IL4.pvalue.csv
+
+
+
 ####################################################################################################################
 wget https://raw.githubusercontent.com/Shicheng-Guo/miRNA-RA/master/db/hsa.gff.hg19.bed -O hsa.gff3.hg38.bed 
 wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/liftOver -O liftOver
