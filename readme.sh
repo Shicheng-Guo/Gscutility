@@ -18,6 +18,7 @@ echo $i
 bcftools query -l $i >> sample.txt
 done
 
+
 rm WP_227127_30740_B6_NPP413.fstl1.vcf.gz*
 rm WP_227129_30743_C11_NPP429.fstl1.vcf.gz
 rm WP_227130_30736_C1_NPP412.fstl1.vcf.gz
