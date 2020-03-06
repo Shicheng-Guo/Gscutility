@@ -14,10 +14,9 @@ done
 for i in `ls *.fstl1.vcf.gz`
 do
 echo $i
-bcftools index -t $i
+#bcftools index -t $i
+bcftools query -l $i >> sample.txt
 done
-
-
 
 rm WP_227127_30740_B6_NPP413.fstl1.vcf.gz*
 rm WP_227129_30743_C11_NPP429.fstl1.vcf.gz
@@ -36,7 +35,7 @@ bcftools merge -l merge.txt -Oz -o FSTL1.vcf.gz
 ls *.fstl1.vcf.gz | tail -n 1021 > merge.txt
 bcftools merge -l merge.txt -Oz -o FSTL1.vcf.gz
 
- 
+
 
 use strict;
 my @file=glob("WP_*");
@@ -49,14 +48,54 @@ use strict;
 my @file=glob("*.vcf.gz");
 foreach my $file(@file){
 my($id,undef)=split/.filtered.vcf.gz/,$file;
-if($a =~/-a/){
-my ($name)=split/-/,$a;
-print "$id\t$a\n";
+if($id =~/-a/){
+my ($name)=split/-/,$id;
+print "$id $name\n";
 }else{
-my ($name)=split/-/,$a;
-print "$id\t$a\n";
+my (undef,$name,undef)=split/-/,$id;
+print "$id $name\n";
 }
 }
+
+use strict;
+my $file="sample.txt";
+open F, my $file;
+while(my $file=<F>){
+my($id,undef)=split/.filtered.vcf.gz/,$file;
+if($id =~/-a/){
+my ($name)=split/-/,$id;
+print "$id $name\n";
+}else{
+my (undef,$name,undef)=split/-/,$id;
+print "$id $name\n";
+}
+}
+
+
+for i in `ls *.fstl1.vcf.gz`
+do
+echo $i
+bcftools reheader -s newname.txt $i -o ../newfstl1/$i
+done
+
+
+rm merge.txt
+for i in `ls *.fstl1.vcf.gz | rev | cut -c 14- | rev | uniq`
+do
+#echo $i >> merge.txt
+#plink --vcf $i.fstl1.vcf.gz --make-bed --out ./plink/$i
+plink --vcf $i.fstl1.vcf.gz --exclude ./plink/plink-merge.missnp --make-bed --out ./plink/$i
+done
+
+
+plink --bfile 226293 --merge-list merge.txt --make-bed --out FSTL1
+
+PMI-merge.missnp
+
+
+
+merge all the vcf files with Plink
+
 
 
 sguo234@deepthought.genetics.wisc.edu; 0753Ovjj
@@ -71,6 +110,10 @@ wget https://github.com/samtools/htslib/releases/download/1.10.2/htslib-1.10.2.t
 wget http://s3.amazonaws.com/plink1-assets/dev/plink_linux_x86_64.zip
 
 WP_227753_30732_G7_NPP3551      227755-a1
+
+
+
+
 
 
 
