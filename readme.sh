@@ -11,12 +11,13 @@ echo $i
 bcftools view -r 3:120113060-120169918 $i.filtered.vcf.gz -Oz -o ../fstl1/$i.fstl1.vcf.gz
 done
 
-
-for i in `ls *-a.filtered.vcf.gz`
+for i in `ls *.fstl1.vcf.gz`
 do
 echo $i
 bcftools index -t $i
 done
+
+
 
 rm WP_227127_30740_B6_NPP413.fstl1.vcf.gz*
 rm WP_227129_30743_C11_NPP429.fstl1.vcf.gz
@@ -29,14 +30,32 @@ rm WP_227142_30734_D11_NPP355.fstl1.vcf.gz
 
 ls *.vcf.gz > merge.txt
 
+ls *.vcf.gz | head -n 1020 > merge.txt
 bcftools merge -l merge.txt -Oz -o FSTL1.vcf.gz
 
+ls *.fstl1.vcf.gz | tail -n 1021 > merge.txt
+bcftools merge -l merge.txt -Oz -o FSTL1.vcf.gz
+
+ 
 
 use strict;
 my @file=glob("WP_*");
 foreach my $file(@file){
 my(undef,$id,undef)=split/_/,$file;
 system("cp $file $id-a.filtered.vcf.gz")
+}
+
+use strict;
+my @file=glob("*.vcf.gz");
+foreach my $file(@file){
+my($id,undef)=split/.filtered.vcf.gz/,$file;
+if($a =~/-a/){
+my ($name)=split/-/,$a;
+print "$id\t$a\n";
+}else{
+my ($name)=split/-/,$a;
+print "$id\t$a\n";
+}
 }
 
 
@@ -49,6 +68,11 @@ cd ~/tools/
 wget https://github.com/samtools/bcftools/releases/download/1.10.2/bcftools-1.10.2.tar.bz2
 wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2
 wget https://github.com/samtools/htslib/releases/download/1.10.2/htslib-1.10.2.tar.bz2
+wget http://s3.amazonaws.com/plink1-assets/dev/plink_linux_x86_64.zip
+
+WP_227753_30732_G7_NPP3551      227755-a1
+
+
 
 tar xjvf htslib-1.10.2.tar.bz2
 cd 
