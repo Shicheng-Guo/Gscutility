@@ -1,12 +1,35 @@
 /data/exome
 
+for i in `ls *.vcf.gz`
+do
+bcftools view -r 3:120113060-120169918 $i
+done
+
+for i in `ls *.vcf.gz`
+do
+tabix -p vcf $i
+done
+
+sguo234@deepthought.genetics.wisc.edu; 0753Ovjj
+
+sguo234@deepthought.genetics.wisc.edu
+
+indels_filtered.vcf.gz
+226917-a.filtered.vcf.gz
+
+cd ~/tools/
 wget https://github.com/samtools/bcftools/releases/download/1.10.2/bcftools-1.10.2.tar.bz2
 wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2
 wget https://github.com/samtools/htslib/releases/download/1.10.2/htslib-1.10.2.tar.bz2
 
 tar xjvf htslib-1.10.2.tar.bz2
+cd 
 ./configure --disable-bz2 --disable-lzma
 ./make --disable-bz2 --disable-lzma
+
+
+
+
 
 scp *.vcf.gz root@101.133.145.142:/data/exome
 
@@ -43,10 +66,7 @@ wget https://www.cog-genomics.org/static/bin/plink/glist-hg19 -O glist-hg19
 wget https://www.cog-genomics.org/static/bin/plink/glist-hg38 -O glist-hg38
 awk '{print $1,$2-5000,$3+5000,$4}' OFS="\t" glist-hg19 > glist-hg19.5k.bed
 awk '{print $1,$2-5000,$3+5000,$4}' OFS="\t" glist-hg38 > glist-hg38.5k.bed
-
 bedtools intersect -wao -a plink.qassoc.hg19.bed -b glist-hg19.5k.bed | grep -v '\-1' | awk '{print $1,$2,$3,$4,$5,$6,$10}' OFS="," > IL4.pvalue.csv
-
-
 
 ####################################################################################################################
 wget https://raw.githubusercontent.com/Shicheng-Guo/miRNA-RA/master/db/hsa.gff.hg19.bed -O hsa.gff3.hg38.bed 
@@ -402,7 +422,6 @@ bedtools intersect -wa -a /home/mxiong/db/snp151.hg38.bed -b hsa.gff3.mature.hg3
 
 bedtools intersect -wa -a /home/mxiong/db/snp151.hg38.bed -b hsa.gff3.mature.hg38.bed >snp151.gff3.rs.mature.all.bed &
 
-
 bedtools intersect -wa -a /home/mxiong/db/snp151.common.hg38.bed -b hsa.gff3.mature.hg38.bed > snp151.gff3.rs.mature.common.bed &
 
 bedtools intersect -wa -a /home/mxiong/db/snp151.common.hg38.bed -b hsa.gff3.primary.hg38.bed > snp151.gff3.rs.p.common.bed &
@@ -545,6 +564,9 @@ du ./ -h --max-depth 1
 scp -r cpgSNP nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/cpgSNP
 scp -r autism nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/xxs/autism
 scp -r MIR nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/mirsnp
+
+scp -r nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/exome/ ./
+
 
 scp result_extract_forward* nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/pmrp
 
