@@ -11,6 +11,7 @@ echo $i
 bcftools view -r 3:120113060-120169918 $i.filtered.vcf.gz -Oz -o ../fstl1/$i.fstl1.vcf.gz
 done
 
+
 for i in `ls *-a.filtered.vcf.gz`
 do
 echo $i
@@ -27,6 +28,7 @@ rm WP_227139_30741_C9_NPP429.fstl1.vcf.gz
 rm WP_227142_30734_D11_NPP355.fstl1.vcf.gz
 
 ls *.vcf.gz > merge.txt
+
 bcftools merge -l merge.txt -Oz -o FSTL1.vcf.gz
 
 
