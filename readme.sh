@@ -1,19 +1,27 @@
-/data/exome
 
-for i in `ls *.vcf.gz`
+for i in `ls *-a*.vcf.gz | rev | cut -c 19- | rev | uniq`
 do
-bcftools view -r 3:120113060-120169918 $i
+echo $i
+bcftools view -r 3:120113060-120169918 $i-a.filtered.vcf.gz -Oz -o ../fstl1/$i.fstl1.vcf.gz
+done
+
+for i in `ls WP_*.vcf.gz | rev | cut -c 17- | rev | uniq`
+do
+echo $i
+bcftools view -r 3:120113060-120169918 $i.filtered.vcf.gz -Oz -o ../fstl1/$i.fstl1.vcf.gz
 done
 
 for i in `ls *.vcf.gz`
 do
-tabix -p vcf $i
+echo $i
+bcftools index -t $i
 done
+
+
+
 
 sguo234@deepthought.genetics.wisc.edu; 0753Ovjj
-
 sguo234@deepthought.genetics.wisc.edu
-
 indels_filtered.vcf.gz
 226917-a.filtered.vcf.gz
 
@@ -27,8 +35,12 @@ cd
 ./configure --disable-bz2 --disable-lzma
 ./make --disable-bz2 --disable-lzma
 
+bcftools merge -l file.txt -Oz -o miRNA.CHB.SNP.vcf.gz
 
-
+ls *-a*vcf.gz > merge1.txt
+ls WP*vcf.gz > merge2.txt
+bcftools merge -l merge.txt -Oz -o PMI.s1.vcf.gz
+bcftools merge -l merge2.txt -Oz -o PMI.s2.vcf.gz
 
 
 scp *.vcf.gz root@101.133.145.142:/data/exome
