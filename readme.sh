@@ -11,13 +11,31 @@ echo $i
 bcftools view -r 3:120113060-120169918 $i.filtered.vcf.gz -Oz -o ../fstl1/$i.fstl1.vcf.gz
 done
 
-for i in `ls *.vcf.gz`
+for i in `ls *-a.filtered.vcf.gz`
 do
 echo $i
 bcftools index -t $i
 done
 
+rm WP_227127_30740_B6_NPP413.fstl1.vcf.gz*
+rm WP_227129_30743_C11_NPP429.fstl1.vcf.gz
+rm WP_227130_30736_C1_NPP412.fstl1.vcf.gz
+rm WP_227133_30733_C3_NPP355.fstl1.vcf.gz
+rm WP_227136_30732_B11_NPP355.fstl1.vcf.gz
+rm WP_227138_30733_A9_NPP355.fstl1.vcf.gz
+rm WP_227139_30741_C9_NPP429.fstl1.vcf.gz
+rm WP_227142_30734_D11_NPP355.fstl1.vcf.gz
 
+ls *.vcf.gz > merge.txt
+bcftools merge -l merge.txt -Oz -o FSTL1.vcf.gz
+
+
+use strict;
+my @file=glob("WP_*");
+foreach my $file(@file){
+my(undef,$id,undef)=split/_/,$file;
+system("cp $file $id-a.filtered.vcf.gz")
+}
 
 
 sguo234@deepthought.genetics.wisc.edu; 0753Ovjj
