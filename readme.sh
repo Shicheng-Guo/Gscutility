@@ -1,4 +1,17 @@
 
+
+ls *.vcf.gz | split -l 500 - subset_vcfs
+
+for i in subset_vcfs*; 
+do 
+bcftools merge -0 -l $i -Oz -o merge.$i.vcf.gz; 
+tabix -p vcf merge.$i.vcf.gz
+done
+
+ls merge.*.vcf.gz > merge.txt
+bcftools merge -l merge.txt -Oz -o all_merged.vcf.gz
+
+
 for i in `ls *-a*.vcf.gz | rev | cut -c 19- | rev | uniq`
 do
 echo $i
@@ -14,10 +27,9 @@ done
 for i in `ls *.fstl1.vcf.gz`
 do
 echo $i
-#bcftools index -t $i
-bcftools query -l $i >> sample.txt
+bcftools index -t $i
+#bcftools query -l $i >> sample.txt
 done
-
 
 rm WP_227127_30740_B6_NPP413.fstl1.vcf.gz*
 rm WP_227129_30743_C11_NPP429.fstl1.vcf.gz
@@ -35,8 +47,6 @@ bcftools merge -l merge.txt -Oz -o FSTL1.vcf.gz
 
 ls *.fstl1.vcf.gz | tail -n 1021 > merge.txt
 bcftools merge -l merge.txt -Oz -o FSTL1.vcf.gz
-
-
 
 use strict;
 my @file=glob("WP_*");
