@@ -3,8 +3,6 @@
 bcftools view -G Final.vcf.gz --threads 32 -Ov -o avinput.vcf
 table_annovar.pl -vcfinput avinput.vcf ~/tools/annovar/humandb/ --thread 12 -buildver hg19 -out myanno -remove -protocol refGene,dbnsfp33a -operation gx,f -nastring . -otherinfo -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt
 
-perl -lane '{print $1 if /dist=(\d+)/}' myanno.refGene.variant_function > dist
-
 data<-read.table("c1",as.is=T)
 anno<-data[,1]
 anno[anno=="ncRNA_UTR5"]<-"ncRNA_exonic"
@@ -16,6 +14,25 @@ anno[anno=="upstream;downstream"]<-"intergenic"
 input<-table(anno)
 pdf("pie.annovar.pdf")
 pie(input,col=rainbow(length(input)),main="N=13,494,289 SNPs")
+dev.off()
+
+perl -lane '{print $1 if /dist=(\d+)/}' myanno.refGene.variant_function > dist
+data<-read.table("dist",as.is=T)
+distance<-data[,1]
+pdf("dist.annovar.pdf")
+hist(distance,col=rainbow(20),main=paste("N=",length(distance),"SNPs",sep=" "))
+dev.off()
+distance<-distance[distance<100000]
+pdf("dist.100k.annovar.pdf")
+hist(distance,col=rainbow(20),main=paste("N=",length(distance),"SNPs",sep=" "),xlab="distance to nearby exome (bp)")
+dev.off()
+distance<-distance[distance<10000]
+pdf("dist.10k.annovar.pdf")
+hist(distance,col=rainbow(20),main=paste("N=",length(distance),"SNPs",sep=" "),xlab="distance to nearby exome (bp)")
+dev.off()
+distance<-distance[distance<1000]
+pdf("dist.1k.annovar.pdf")
+hist(distance,col=rainbow(20),main=paste("N=",length(distance),"SNPs",sep=" "),xlab="distance to nearby exome (bp)")
 dev.off()
 
 
