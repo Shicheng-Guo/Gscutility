@@ -1,15 +1,28 @@
 
+scp nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/exome/*  ./
 
-ls *.vcf.gz | split -l 500 - subset_vcfs
 
+ls *.vcf.gz | split -l 200 - subset_vcfs
 for i in subset_vcfs*; 
 do 
-bcftools merge -0 -l $i -Oz -o merge.$i.vcf.gz; 
-tabix -p vcf merge.$i.vcf.gz
+echo $i
+bcftools merge -0 -l $i -Oz -o merge.$i.vcf.gz 
+#tabix -p vcf merge.$i.vcf.gz
 done
 
 ls merge.*.vcf.gz > merge.txt
-bcftools merge -l merge.txt -Oz -o all_merged.vcf.gz
+bcftools merge -l merge.txt -0 -Oz -o all_merged.vcf.gz
+bcftools annotate -x INFO,^FORMAT/GT all_merged.vcf.gz -Oz -o Final.vcf.gz
+
+
+
+awk '{print $1,$2,$6}' PheTyp1_RA_C1.phen > PheTyp1_RA_C1
+awk '{print $1,$2,$6}' PheTyp1_RA_C2.phen > PheTyp1_RA_C2
+
+plink --bfile FSTL1 --keep PheTyp1_RA_C1.phen --pheno PheTyp1_RA_C1 --freq case-control --ci 0.95 --make-bed --allow-no-sex --assoc --adjust  --out FSTL1_RA_C1
+plink --bfile FSTL1 --keep PheTyp1_RA_C1.phen --pheno PheTyp1_RA_C1 --freq --ci 0.95 --make-bed --allow-no-sex --assoc --adjust  --out FSTL1_RA_C1
+
+
 
 
 for i in `ls *-a*.vcf.gz | rev | cut -c 19- | rev | uniq`
@@ -24,10 +37,11 @@ echo $i
 bcftools view -r 3:120113060-120169918 $i.filtered.vcf.gz -Oz -o ../fstl1/$i.fstl1.vcf.gz
 done
 
-for i in `ls *.fstl1.vcf.gz`
+for i in `ls *.vcf.gz`
 do
 echo $i
-bcftools index -t $i
+#bcftools index -f -t $i
+tabix -p vcf $i
 #bcftools query -l $i >> sample.txt
 done
 
@@ -47,6 +61,8 @@ bcftools merge -l merge.txt -Oz -o FSTL1.vcf.gz
 
 ls *.fstl1.vcf.gz | tail -n 1021 > merge.txt
 bcftools merge -l merge.txt -Oz -o FSTL1.vcf.gz
+bcftools annotate -x INFO,^FORMAT/GT,FORMAT/PL FSTL1.vcf.gz
+
 
 use strict;
 my @file=glob("WP_*");
@@ -103,7 +119,7 @@ plink --bfile 226293 --merge-list merge.txt --make-bed --out FSTL1
 
 PMI-merge.missnp
 
-
+perl rename2.pl | sort -u > newname.txt
 
 merge all the vcf files with Plink
 
@@ -654,7 +670,7 @@ find . -name "*.o*" -type 'f'  -delete
 find . -name "*.job*" -type 'f'  -delete
 find . -name "*" -type 'f' -size +15000k print
 
-find . -name "*.*" -type 'f' -size 0k 
+find . -name "*.*" -type 'f' -size 0k -delete
 
 
 scp -r db/* nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/AnnotationDatabase/
@@ -1684,8 +1700,8 @@ cd ~/hpc/tools/annovar
 annotate_variation.pl -buildver hg19 -downdb cytoBand humandb/
 annotate_variation.pl -buildver hg19 -downdb -webfrom annovar refGene humandb/
 # just for allele frequency
-annotate_variation.pl -downdb -webfrom annovar exac03 humandb -buildver hg38  &
-annotate_variation.pl -downdb -webfrom annovar esp6500siv2 humandb -buildver hg38 &
+# annotate_variation.pl -downdb -webfrom annovar exac03 humandb -buildver hg38  &
+# annotate_variation.pl -downdb -webfrom annovar esp6500siv2 humandb -buildver hg38 &
 annotate_variation.pl -downdb -webfrom annovar esp6500siv2_all humandb -buildver hg38 &
 annotate_variation.pl -downdb -webfrom annovar gnomad_exome humandb -buildver hg38 &
 # whole-exome data
