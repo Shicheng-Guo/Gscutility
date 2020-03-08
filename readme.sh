@@ -1,7 +1,22 @@
 
 
 bcftools view -G Final.vcf.gz --threads 32 -Ov -o avinput.vcf
-table_annovar.pl -vcfinput avinput.vcf ~/hpc/tools/annovar/humandb/ --thread 4 -buildver hg19 -out T1 -remove -protocol refGene,dbnsfp33a -operation gx,f -nastring . -otherinfo -polish -xref ~/hpc/tools/annovar/humandb/gene_fullxref.txt
+table_annovar.pl -vcfinput avinput.vcf ~/tools/annovar/humandb/ --thread 12 -buildver hg19 -out myanno -remove -protocol refGene,dbnsfp33a -operation gx,f -nastring . -otherinfo -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt
+
+perl -lane '{print $1 if /dist=(\d+)/}' myanno.refGene.variant_function > dist
+
+data<-read.table("c1",as.is=T)
+anno<-data[,1]
+anno[anno=="ncRNA_UTR5"]<-"ncRNA_exonic"
+anno[anno=="ncRNA_exonic;splicing"]<-"ncRNA_exonic"
+anno[anno=="exonic;splicing"]<-"splicing"
+anno[anno=="UTR5;UTR3"]<-"exonic"
+anno[anno=="ncRNA_splicing"]<-"splicing"
+anno[anno=="upstream;downstream"]<-"intergenic"
+input<-table(anno)
+pdf("pie.annovar.pdf")
+pie(input,col=rainbow(length(input)),main="N=13,494,289 SNPs")
+dev.off()
 
 
 scp nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/exome/*  ./
