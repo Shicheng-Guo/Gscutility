@@ -1,4 +1,9 @@
 
+table_annovar.pl -vcfinput avinput.vcf ~/hpc/tools/annovar/humandb/ --thread 4 -buildver hg19 -out T1 -remove -protocol refGene,dbnsfp33a -operation gx,f -nastring . -otherinfo -polish -xref ~/hpc/tools/annovar/humandb/gene_fullxref.txt
+
+bcftools view -G Final.vcf.gz -Ov -o avinput.vcf
+
+
 scp nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/exome/*  ./
 
 
@@ -7,7 +12,7 @@ for i in subset_vcfs*;
 do 
 echo $i
 bcftools merge -0 -l $i -Oz -o merge.$i.vcf.gz 
-#tabix -p vcf merge.$i.vcf.gz
+tabix -p vcf merge.$i.vcf.gz
 done
 
 ls merge.*.vcf.gz > merge.txt
@@ -45,14 +50,6 @@ tabix -p vcf $i
 #bcftools query -l $i >> sample.txt
 done
 
-rm WP_227127_30740_B6_NPP413.fstl1.vcf.gz*
-rm WP_227129_30743_C11_NPP429.fstl1.vcf.gz
-rm WP_227130_30736_C1_NPP412.fstl1.vcf.gz
-rm WP_227133_30733_C3_NPP355.fstl1.vcf.gz
-rm WP_227136_30732_B11_NPP355.fstl1.vcf.gz
-rm WP_227138_30733_A9_NPP355.fstl1.vcf.gz
-rm WP_227139_30741_C9_NPP429.fstl1.vcf.gz
-rm WP_227142_30734_D11_NPP355.fstl1.vcf.gz
 
 ls *.vcf.gz > merge.txt
 
@@ -1659,6 +1656,8 @@ tabix -p vcf RA2020-B9.chr22.beagle.vcf.gz
 table_annovar.pl -vcfinput avinput.vcf ~/hpc/tools/annovar/humandb/ --thread 4 -buildver hg19 -out T1 -remove -protocol refGene,dbnsfp33a -operation gx,f -nastring . -otherinfo -polish -xref ~/hpc/tools/annovar/humandb/gene_fullxref.txt
 annotate_variation.pl -filter -dbtype generic -genericdbfile annovar_eqtl.hg19.bed -build hg19 -out ex1 test.anno ./
 
+bcftools view -G Final.vcf.gz -Ov -o avinput.vcf
+
 annotate_variation.pl -downdb -webfrom annovar -build hg19 dbnsfp35a ~/hpc/tools/annovar/humandb/
 annotate_variation.pl -downdb -webfrom annovar -build hg19 dbnsfp31a_interpro ~/hpc/tools/annovar/humandb/
 annotate_variation.pl -downdb -webfrom annovar -build hg19 ljb26_all ~/hpc/tools/annovar/humandb/
@@ -1696,6 +1695,7 @@ annotate_variation.pl -downdb -buildver hg38 -webfrom annovar snp135NonFlagged ~
 java -jar customprodbj.jar -f input_variant_file_list.txt -d annovar_database/humandb/hg19_refGeneMrna.fa -r annovar_database/humandb/hg19_refGene.txt -t -o out/
 #################################################################################################################################
 #################################################################################################################################
+
 cd ~/hpc/tools/annovar
 annotate_variation.pl -buildver hg19 -downdb cytoBand humandb/
 annotate_variation.pl -buildver hg19 -downdb -webfrom annovar refGene humandb/
