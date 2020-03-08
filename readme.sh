@@ -1,7 +1,7 @@
 
-table_annovar.pl -vcfinput avinput.vcf ~/hpc/tools/annovar/humandb/ --thread 4 -buildver hg19 -out T1 -remove -protocol refGene,dbnsfp33a -operation gx,f -nastring . -otherinfo -polish -xref ~/hpc/tools/annovar/humandb/gene_fullxref.txt
 
-bcftools view -G Final.vcf.gz -Ov -o avinput.vcf
+bcftools view -G Final.vcf.gz --threads 32 -Ov -o avinput.vcf
+table_annovar.pl -vcfinput avinput.vcf ~/hpc/tools/annovar/humandb/ --thread 4 -buildver hg19 -out T1 -remove -protocol refGene,dbnsfp33a -operation gx,f -nastring . -otherinfo -polish -xref ~/hpc/tools/annovar/humandb/gene_fullxref.txt
 
 
 scp nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/exome/*  ./
