@@ -1,49 +1,4 @@
 
-
-data1 <- data.frame(read_excel("miR-target.xlsx",sheet=1))
-data2 <- data.frame(read_excel("miR-target.xlsx",sheet=2))
-data3 <- data.frame(read_excel("miR-target.xlsx",sheet=3))
-data4 <- data.frame(read_excel("miR-target.xlsx",sheet=4))
-data5 <- data.frame(read_excel("miR-target.xlsx",sheet=5))
-data6 <- data.frame(read_excel("miR-target.xlsx",sheet=6))
-
-
-
-
-temp1 <- data.frame(read_excel("Table-S4.xlsx",sheet=1))
-temp2 <- data.frame(read_excel("Table-S5.xlsx",sheet=1,col_names=F))
-
-x1<-data1[which(data1[,5] %in% temp2[,1]),]
-x2<-data2[which(data2[,5] %in% temp2[,1]),]
-x3<-data3[which(data3[,5] %in% temp2[,1]),]
-x4<-data4[which(data4[,5] %in% temp2[,1]),]
-x5<-data5[which(data5[,5] %in% temp2[,1]),]
-x6<-data6[which(data6[,5] %in% temp2[,1]),]
-
-dim(x1)
-dim(x2)
-dim(x3)
-dim(x4)
-dim(x5)
-dim(x6)
-
-x<-rbind(x1,x2,x3,x4,x5,x6)
-x[,4]<-gsub("hsa-","",x[,4])
-
-library(igraph)
-links <- data.frame(source=x[,4],target=x[,5])
-network <- graph_from_data_frame(d=links, directed=F)
-pdf("network.pdf")
-plot(network,col=rainbow(22))
-dev.off()
-
-data<- data.frame(read_excel("miRDB_target_prediction_data.xls",sheet=1))
-data$miRNA.Name<-gsub("hsa-","",data$miRNA.Name)
-data<-data[,c(3,5,2)]
-write.table(data,file="miRDB_target_prediction_data.txt",sep="\t",quote=F,col.names=T,row.names=F)
-
-
-
 bcftools view -G Final.vcf.gz --threads 32 -Ov -o avinput.vcf
 table_annovar.pl -vcfinput avinput.vcf ~/tools/annovar/humandb/ --thread 12 -buildver hg19 -out myanno -remove -protocol refGene,dbnsfp33a -operation gx,f -nastring . -otherinfo -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt
 
