@@ -1,4 +1,7 @@
 
+wget http://hgdownload.cse.ucsc.edu/goldenpath/hg38/database/cytoBand.txt.gz -O cytoBand.hg38.bed.gz
+
+
 bcftools view -G Final.vcf.gz --threads 32 -Ov -o avinput.vcf
 table_annovar.pl -vcfinput avinput.vcf ~/tools/annovar/humandb/ --thread 12 -buildver hg19 -out myanno -remove -protocol refGene,dbnsfp33a -operation gx,f -nastring . -otherinfo -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt
 
