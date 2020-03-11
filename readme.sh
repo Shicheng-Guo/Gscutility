@@ -1425,7 +1425,6 @@ Rscript manhattan.plot.R plink.assoc.logistic.add
 ## local
 head -n 50 plink.assoc.logistic.adjusted
 
-
 assoc1="/gpfs/home/guosa/hpc/rheumatology/RA/RA500/RA500.assoc"
 assoc2="/gpfs/home/guosa/hpc/rheumatology/RA/he2020/RA1000.assoc"
 plink --meta-analysis $assoc1 $assoc2
@@ -1573,11 +1572,9 @@ echo plink --bfile chr$i --assoc --adjust gc --threads 31 --allow-no-sex  --ci 0
 qsub $i.job
 done
 
-
 wget https://raw.githubusercontent.com/Shicheng-Guo/rheumatoidarthritis/master/high-LD-regions.txt
 
 plink --bfile chr1 --allow-no-sex --maf 0.05 --merge-list merge.txt --make-bed --out RA500
-
 
 plink --bfile RA500 --exclude high-LD-regions.txt --range --indep-pairwise 50 5 0.2
 plink --bfile RA500 --allow-no-sex  --extract plink.prune.in --genome --make-bed --out temp
@@ -1585,7 +1582,6 @@ plink --bfile temp --pca --maf 0.05 --memory 40000 --cluster --mds-plot 4 --out 
 plink --bfile RA500 --allow-no-sex --logistic --threads 31 --covar RA500.eigenvec --covar-number 1-4 --adjust --out RA500
 plink --bfile RA500 --assoc --adjust gc --threads 31 --allow-no-sex  --ci 0.95  --counts --out RA500.counts
 plink --bfile RA500 --assoc --adjust gc --threads 31 --allow-no-sex  --ci 0.95  --out RA500.freq 
-
 
 for i in {2..22}
 do
@@ -1597,7 +1593,6 @@ gunzip chr22.info.gz
 plink --vcf chr22.dose.vcf.gz --make-bed --out chr22
 plink --bfile chr22 --list-duplicate-vars --out chr22
 plink --bfile chr22 --exclude plink.dupvar --make-bed --out ../plink/chr22
-
 
 plink --bfile RA2020 --mind 0.05 --make-bed --out RA2020-B1
 plink --bfile RA2020-B1 --geno 0.95 --make-bed --out RA2020-B2
