@@ -1,6 +1,7 @@
-
 use strict;
-open F,"/home/guosa/hpc/db/hg19/dbSNP152.hg19.vcf";
+use Cwd;
+chdir getcwd;
+open F,"dbSNP153.hg19.vcf";
 while(<F>){
 chomp;
 my $line=$_;
