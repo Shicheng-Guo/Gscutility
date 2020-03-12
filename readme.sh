@@ -1,7 +1,12 @@
 
+################################################################################################
+### addfakegenotype to dbSNP153 and then transfer to plink format
+wget https://raw.githubusercontent.com/Shicheng-Guo/Gscutility/master/addfakegenotype.pl
+perl addfakegenotype.pl > dbSNP153.hg19.plink.vcf
+plink --vcf dbSNP153.hg19.plink.vcf --make-bed --allow-extra-chr --out dbSNP153.hg19
+################################################################################################
+
 wget http://hgdownload.cse.ucsc.edu/goldenpath/hg38/database/cytoBand.txt.gz -O cytoBand.hg38.bed.gz
-
-
 bcftools view -G Final.vcf.gz --threads 32 -Ov -o avinput.vcf
 table_annovar.pl -vcfinput avinput.vcf ~/tools/annovar/humandb/ --thread 12 -buildver hg19 -out myanno -remove -protocol refGene,dbnsfp33a -operation gx,f -nastring . -otherinfo -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt
 
