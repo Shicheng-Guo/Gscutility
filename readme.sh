@@ -56,6 +56,9 @@ plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --
 wget https://www.cog-genomics.org/static/bin/plink/glist-hg19 -O glist-hg19
 wget https://www.cog-genomics.org/static/bin/plink/glist-hg38 -O glist-hg38
 #############################################################################
+# Gene Reports
+plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --logistic --adjust --ci 0.95 --out RA-CTR
+plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --logistic --adjust --ci 0.95 --gene-report RA-CTR.assoc.logistic glist-hg19 --gene-list-border 2 --out RA-CTR
 ## RVTEST
 wget http://qbrc.swmed.edu/zhanxw/seqminer/data/refFlat_hg19.txt.gz
 wget http://qbrc.swmed.edu/zhanxw/seqminer/data/refFlat.gencode.v19.gz
