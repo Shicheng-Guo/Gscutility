@@ -1679,15 +1679,11 @@ echo unzip -P N1fsvXwtY.ZR6Q chr_$i.zip  >> $i.job
 qsub $i.job
 done
 
-
 plink --bfile ../RA2020-B9 --chr 22 --recode vcf-iid --out RA2020-B9.chr22
 bcftools view RA2020-B9.chr22.vcf -Oz -o RA2020-B9.chr22.vcf.gz
 tabix -p vcf RA2020-B9.chr22.vcf.gz
 java -jar ./conform-gt.24May16.cee.jar gt=RA2020-B9.chr22.vcf.gz match=POS chrom=22 ref=/gpfs/home/guosa/hpc/db/hg19/beagle/EAS/chr22.1kg.phase3.v5a.EAS.vcf.gz out=RA2020-B9.chr22.beagle
 tabix -p vcf RA2020-B9.chr22.beagle.vcf.gz
-
-
-
 #########################################################################################################################################################
 #########################################################################################################################################################
 table_annovar.pl -vcfinput avinput.vcf ~/hpc/tools/annovar/humandb/ --thread 4 -buildver hg19 -out T1 -remove -protocol refGene,dbnsfp33a -operation gx,f -nastring . -otherinfo -polish -xref ~/hpc/tools/annovar/humandb/gene_fullxref.txt
