@@ -7,27 +7,23 @@ tabix -p vcf dbSNP153.chr3.norm.hg19.vcf.gz
 bcftools annotate --threads 48 -c ID -a dbSNP153.chr3.norm.hg19.vcf.gz FSTL1.vcf.gz -Oz -o FSTL1.RS.vcf.gz
 plink --vcf FSTL1.RS.vcf.gz --make-bed --out FSTL1
 
-plink --bfile FSTL1 --pheno PheTyp1_RA_C1 --allow-no-sex --assoc fisher counts --adjust --ci 0.95 --out FSTL1.C1
+plink --bfile FSTL1 --pheno PheTyp1_RA_C1 --allow-no-sex --assoc counts --adjust --ci 0.95 --out FSTL1.C1
 sort -k8,8n FSTL1.C1.assoc.fisher > FSTL1.C1.assoc.sort.fisher
 
-plink --bfile FSTL1 --pheno PheTyp1_RA_C2 --allow-no-sex --assoc fisher counts --adjust --ci 0.95 --out FSTL1.C2
+plink --bfile FSTL1 --pheno PheTyp1_RA_C2 --allow-no-sex --assoc counts --adjust --ci 0.95 --out FSTL1.C2
 sort -k8,8n FSTL1.C2.assoc.fisher > FSTL1.C2.assoc.sort.fisher
 
 bcftools view --threads 48 -G FSTL1.RS.vcf.gz -Oz -o FSTL1.RG.vcf.gz
 zcat FSTL1.RG.vcf.gz| awk '{print $1,$2,$2,$4,$5,$3}\' OFS="\t"| grep -v '#' > FSTL1.RG.avinput
 table_annovar.pl FSTL1.RG.avinput ~/tools/annovar/humandb/ -buildver hg19 -out FSTL1 -remove -protocol refGene,cytoBand,avsnp150,dbnsfp35a -operation gx,r,f,f -nastring . -csvout -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt
 
-
-
 anno<-read.csv("FSTL1.hg19_multianno.csv")
 f1<-read.table("FSTL1.C1.assoc.fisher",head=T)
 f2<-read.table("FSTL1.C2.assoc.fisher",head=T)
-
 ff1<-data.frame(f1,anno[match(f1$SNP,anno$avsnp150),])
 ff2<-data.frame(f2,anno[match(f2$SNP,anno$avsnp150),])
-
 write.csv(ff1,file="FSTL1.C1.assoc.fisher.annovar.csv",quote=F)
-write.csv(ff1,file="FSTL1.C2.assoc.fisher.annovar.csv",quote=F)
+write.csv(ff2,file="FSTL1.C2.assoc.fisher.annovar.csv",quote=F)
 
 ####################################################################################################################
 ####################################################################################################################
