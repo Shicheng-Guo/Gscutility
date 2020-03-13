@@ -1,6 +1,5 @@
 ####################################################################################################################
 ####################################################################################################################
-####################################################################################################################
 #### FSTL1 Exome-Sequencing Project 03/13/2020
 bcftools view ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz -r 3:120113124-120169850 -Oz -o dbSNP153.chr3.norm.hg19.vcf.gz
 tabix -p vcf dbSNP153.chr3.norm.hg19.vcf.gz
@@ -24,8 +23,6 @@ ff1<-data.frame(f1,anno[match(f1$SNP,anno$avsnp150),])
 ff2<-data.frame(f2,anno[match(f2$SNP,anno$avsnp150),])
 write.csv(ff1,file="FSTL1.C1.assoc.fisher.annovar.csv",quote=F)
 write.csv(ff2,file="FSTL1.C2.assoc.fisher.annovar.csv",quote=F)
-
-####################################################################################################################
 ####################################################################################################################
 ####################################################################################################################
 #### MIR-SNP Project 03/13/2020
@@ -24306,7 +24303,6 @@ rsync -a -P rsync://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeHa
 /home/k4zhang/my_oasis_tscc/MONOD/tumor_WGBS/BAMfiles/
 /home/k4zhang/my_oasis_tscc/MONOD/RRBS_merge/Bam_Merged_Feb2015
 
-
 # 2015-10-22
 # chr17:16955467-16955609 in Colon_primary_tumor.chr17.sorted.clipped.bam
 samtools tview -p chr17:16955467 /home/k4zhang/my_oasis_tscc/MONOD/tumor_WGBS/BAMfiles/Colon_primary_tumor.chr17.sorted.clipped.bam  /home/shg047/db/hg19.fa
@@ -24323,9 +24319,7 @@ samtools tview -p chr20:44441518-44441605 /home/k4zhang/my_oasis_tscc/MONOD/RRBS
 
 # BSPP
 samtools tview -p chr1:117909025 /home/k4zhang/my_oasis_tscc/MONOD/WGBS_BSPP/BAMfiles/6P-10.sorted.clipped.rmdup.bam /home/shg047/db/hg19.fa
-
 samtools tview -p chr1:10003741 /home/k4zhang/my_oasis_tscc/MONOD/hESC_WGBS/BAMfiles/methylC-seq_h1-npc_r1.chr1.rmdup.bam /home/shg047/db/hg19.fa
-
 
 # achieve regions from methylation mhl files
 cd /home/shg047/monod/dec
