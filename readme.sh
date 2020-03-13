@@ -1,6 +1,21 @@
 ####################################################################################################################
 ####################################################################################################################
+#### PMRP 03/13/2020
+scp nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/pmrp/* ./
+plink --vcf exome.rename.vcf.gz --make-bed --out exome
+
+scp * root@101.133.145.142:/root/pmrp
+
+wget https://faculty.washington.edu/browning/conform-gt/conform-gt.24May16.cee.jar -O conform-gt.24May16.cee.jar
+java -jar ./conform-gt.24May16.cee.jar gt=RA2020-B9.chr$i.vcf.gz match=POS chrom=$i ref=~/hpc/db/hg19/beagle/EAS/chr$i.1kg.phase3.v5a.EAS.vcf.gz  out=RA2020-B9.chr$i.beagle >>$i.job
+bcftools annotate -c ID -a /data/references/hg19/pipe/dbsnp138/00-All.vcf.gz samtools.vcf.gz -o samtools_annotated.vcf.gz
+####################################################################################################################
+####################################################################################################################
 #### FSTL1 Exome-Sequencing Project 03/13/2020
+plink --vcf final.rs.vcf.gz --make-bed --out exome
+bcftools reheader -s newname.txt final.rs.vcf.gz -o exome.rename.vcf.gz --threads 48
+tabix -p vcf exome.rename.vcf.gz
+######################
 bcftools view ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz -r 3:120113124-120169850 -Oz -o dbSNP153.chr3.norm.hg19.vcf.gz
 tabix -p vcf dbSNP153.chr3.norm.hg19.vcf.gz
 bcftools annotate --threads 48 -c ID -a dbSNP153.chr3.norm.hg19.vcf.gz FSTL1.vcf.gz -Oz -o FSTL1.RS.vcf.gz
@@ -24,10 +39,29 @@ ff2<-data.frame(f2,anno[match(f2$SNP,anno$avsnp150),])
 write.csv(ff1,file="FSTL1.C1.assoc.fisher.annovar.csv",quote=F)
 write.csv(ff2,file="FSTL1.C2.assoc.fisher.annovar.csv",quote=F)
 
-
 tabix -p vcf Final.vcf.gz
 bcftools annotate --threads 48 -c ID -a ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz Final.vcf.gz -Oz -o final.rs.vcf.gz
 plink --vcf final.rs.vcf.gz --make-bed --out FSTL1
+
+cp RA3000.R4.fam RA3000.R5.fam
+plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 2 --logistic --adjust --ci 0.95 --out RA-ILD
+plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --logistic --adjust --ci 0.95 --extract fstl1.bed --range --out RA-CTR
+#############################################################################
+(HLA-DRB1, HLA-DQA1, HLA-DQB1 and TNFAIP3)
+wget https://www.cog-genomics.org/static/bin/plink/glist-hg19 -O glist-hg19
+wget https://www.cog-genomics.org/static/bin/plink/glist-hg38 -O glist-hg38
+#############################################################################
+# Gene Reports
+plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --logistic --adjust --ci 0.95 --out RA-CTR
+plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --logistic --adjust --ci 0.95 --gene-report RA-CTR.assoc.logistic glist-hg19 --gene-list-border 2 --out RA-CTR
+## RVTEST
+wget http://qbrc.swmed.edu/zhanxw/seqminer/data/refFlat_hg19.txt.gz
+wget http://qbrc.swmed.edu/zhanxw/seqminer/data/refFlat.gencode.v19.gz
+rvtest --inVcf RA3000.R4.vcf --pheno RA3000.R5.fam --out RA3000-CTR --single wald,score
+rvtest --inVcf RA3000.R4.vcf.gz --pheno RA3000.R5.fam --out RA3000-CTR --geneFile refFlat_hg19.txt.gz --burden cmc --vt price --kernel skat,kbac
+vcf2kinship --inVcf RA3000.R4.vcf --bn --out RA3000
+plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --extract fstl1.bed --range --pheno RA3000.mphen --mpheno 1 --logistic --adjust --ci 0.95 --out FSTL1-RA-CTR
+plink --bfile RA3000.R5 --maf 0.01 --fisher --model trend --extract fstl1.bed --range --hwe 0.01 --adjust --ci 0.95 --out FSTL1-RA-CTR
 
 ##########################################################################################
 ##########################################################################################
