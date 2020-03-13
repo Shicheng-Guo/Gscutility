@@ -54,7 +54,13 @@ plink2 --pfile TEMP --exclude TEMP2.rmdup.mismatch --make-pgen --out TEMP2 --thr
 plink2 --pfile TEMP2 --rm-dup --make-bed --out all_phase3 --threads 24
 rm TEMP*
 ## pgen to --make-bed
-plink2 --pfile all_phase3 --make-bed --out all_phase3 --threads 24
+perl -p -i -e 's/X/23/g' all_phase3.bim
+perl -p -i -e 's/Y/24/g' all_phase3.bim
+perl -p -i -e 's/MT/25/g' all_phase3.bim
+perl -p -i -e 's/PAR1/26/g' all_phase3.bim
+perl -p -i -e 's/PAR2/27/g' all_phase3.bim
+plink --bfile all_phase3 --allow-extra-chr --fst --within all_phase3.clst --out all_phase3 --threads 24
+
 
 phen<-c()
 psam<-read.table("all_phase3.psam",head=F,as.is=T)
@@ -63,8 +69,6 @@ phen$FID<-0
 phen$IID<-psam$IID
 phen$EAS<-psam$SUP
 write.table(phen,file="all_phase3.clst",sep=" ",quote=F,col.names=F,row.names=F)
-
-
 
 
 ####################################################################################################################
