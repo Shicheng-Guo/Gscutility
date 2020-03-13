@@ -23,6 +23,33 @@ ff1<-data.frame(f1,anno[match(f1$SNP,anno$avsnp150),])
 ff2<-data.frame(f2,anno[match(f2$SNP,anno$avsnp150),])
 write.csv(ff1,file="FSTL1.C1.assoc.fisher.annovar.csv",quote=F)
 write.csv(ff2,file="FSTL1.C2.assoc.fisher.annovar.csv",quote=F)
+
+
+tabix -p vcf Final.vcf.gz
+bcftools annotate --threads 48 -c ID -a ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz Final.vcf.gz -Oz -o final.rs.vcf.gz
+plink --vcf final.rs.vcf.gz --make-bed --out FSTL1
+
+for i in `ls *zst | rev | cut -c 5- | rev | uniq`
+do
+echo $i
+plink2 --zst-decompress $i.zst > $i
+done
+
+plink2 --pfile all_phase3 --make-bpgen --out all_phase3 --threads 24
+plink2 --pfile all_phase3 --freq --within all_phase3.clst --fst --threads 24
+
+
+phen<-c()
+psam<-read.table("all_phase3.psam",head=F,as.is=T)
+colnames(psam)<-c("IID","PID","MID","SEX","SUP","POP")
+phen$FID<-0
+phen$IID<-psam$IID
+phen$EAS<-psam$SUP
+write.table(phen,file="all_phase3.clst",sep=" ",quote=F,col.names=F,row.names=F)
+
+
+
+
 ####################################################################################################################
 ####################################################################################################################
 #### MIR-SNP Project 03/13/2020
