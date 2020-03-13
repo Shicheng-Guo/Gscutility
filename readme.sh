@@ -29,6 +29,9 @@ tabix -p vcf Final.vcf.gz
 bcftools annotate --threads 48 -c ID -a ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz Final.vcf.gz -Oz -o final.rs.vcf.gz
 plink --vcf final.rs.vcf.gz --make-bed --out FSTL1
 
+##########################################################################################
+##########################################################################################
+### Processing 1000 Genome data downloaded from plink2 website
 for i in `ls *zst | rev | cut -c 5- | rev | uniq`
 do
 echo $i
@@ -36,6 +39,7 @@ plink2 --zst-decompress $i.zst > $i
 done
 cp phase3_corrected.psam all_phase3.psam
 
+## method 1 with awk and --exclude option
 awk '$5~/,/{print}' all_phase3.pvar | awk '{print $3}' > multiallelic
 plink2 --pfile all_phase3 --exclude multiallelic.txt --make-pgen --out TEMP --threads 24
 plink2 --pfile TEMP --rm-dup --make-bpgen --out TEMP2 --threads 24
@@ -43,14 +47,13 @@ plink2 --pfile TEMP --exclude TEMP2.rmdup.mismatch --make-pgen --out TEMP2 --thr
 plink2 --pfile TEMP --rm-dup --make-bpgen --out TEMP2 --threads 24
 plink2 --pfile TEMP2 --rm-dup --make-bed --out all_phase3 --threads 24
 rm TEMP*
-
 ## method 2 with --max-alleles 2
 plink2 --pfile all_phase3 --max-alleles 2 --make-pgen --out TEMP --threads 24
 plink2 --pfile TEMP --rm-dup --make-bpgen --out TEMP2 --threads 24
 plink2 --pfile TEMP --exclude TEMP2.rmdup.mismatch --make-pgen --out TEMP2 --threads 24
-plink2 --pfile TEMP --rm-dup --make-bpgen --out TEMP2 --threads 24
-plink2 --pfile TEMP2 --make-bed --out all_phase3 --threads 24
+plink2 --pfile TEMP2 --rm-dup --make-bed --out all_phase3 --threads 24
 rm TEMP*
+## pgen to --make-bed
 plink2 --pfile all_phase3 --make-bed --out all_phase3 --threads 24
 
 phen<-c()
