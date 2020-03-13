@@ -1,6 +1,38 @@
 ####################################################################################################################
 ####################################################################################################################
 ####################################################################################################################
+#### FSTL1 Exome-Sequencing Project 03/13/2020
+bcftools view ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz -r 3:120113124-120169850 -Oz -o dbSNP153.chr3.norm.hg19.vcf.gz
+tabix -p vcf dbSNP153.chr3.norm.hg19.vcf.gz
+bcftools annotate --threads 48 -c ID -a dbSNP153.chr3.norm.hg19.vcf.gz FSTL1.vcf.gz -Oz -o FSTL1.RS.vcf.gz
+plink --vcf FSTL1.RS.vcf.gz --make-bed --out FSTL1
+
+plink --bfile FSTL1 --pheno PheTyp1_RA_C1 --allow-no-sex --assoc fisher counts --adjust --ci 0.95 --out FSTL1.C1
+sort -k8,8n FSTL1.C1.assoc.fisher > FSTL1.C1.assoc.sort.fisher
+
+plink --bfile FSTL1 --pheno PheTyp1_RA_C2 --allow-no-sex --assoc fisher counts --adjust --ci 0.95 --out FSTL1.C2
+sort -k8,8n FSTL1.C2.assoc.fisher > FSTL1.C2.assoc.sort.fisher
+
+bcftools view --threads 48 -G FSTL1.RS.vcf.gz -Oz -o FSTL1.RG.vcf.gz
+zcat FSTL1.RG.vcf.gz| awk '{print $1,$2,$2,$4,$5,$3}\' OFS="\t"| grep -v '#' > FSTL1.RG.avinput
+table_annovar.pl FSTL1.RG.avinput ~/tools/annovar/humandb/ -buildver hg19 -out FSTL1 -remove -protocol refGene,cytoBand,avsnp150,dbnsfp35a -operation gx,r,f,f -nastring . -csvout -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt
+
+
+
+anno<-read.csv("FSTL1.hg19_multianno.csv")
+f1<-read.table("FSTL1.C1.assoc.fisher",head=T)
+f2<-read.table("FSTL1.C2.assoc.fisher",head=T)
+
+ff1<-data.frame(f1,anno[match(f1$SNP,anno$avsnp150),])
+ff2<-data.frame(f2,anno[match(f2$SNP,anno$avsnp150),])
+
+write.csv(ff1,file="FSTL1.C1.assoc.fisher.annovar.csv",quote=F)
+write.csv(ff1,file="FSTL1.C2.assoc.fisher.annovar.csv",quote=F)
+
+####################################################################################################################
+####################################################################################################################
+####################################################################################################################
+#### MIR-SNP Project 03/13/2020
 scp root@101.133.145.142:/data/ASA-CHIA_20191211/first_time/all/data_result/RA1000* ./
 scp root@101.133.145.142:/data/ASA-CHIA_20191211/second_time/data_result/result_extract_forward* ./
 plink --bfile result_extract_forward --make-bed --out RA500
@@ -53,6 +85,7 @@ cp RA3000.R4.fam RA3000.R5.fam
 plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 2 --logistic --adjust --ci 0.95 --out RA-ILD
 plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --logistic --adjust --ci 0.95 --extract fstl1.bed --range --out RA-CTR
 #############################################################################
+(HLA-DRB1, HLA-DQA1, HLA-DQB1 and TNFAIP3)
 wget https://www.cog-genomics.org/static/bin/plink/glist-hg19 -O glist-hg19
 wget https://www.cog-genomics.org/static/bin/plink/glist-hg38 -O glist-hg38
 #############################################################################
