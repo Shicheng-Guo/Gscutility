@@ -34,10 +34,24 @@ do
 echo $i
 plink2 --zst-decompress $i.zst > $i
 done
+cp phase3_corrected.psam all_phase3.psam
 
-plink2 --pfile all_phase3 --make-bpgen --out all_phase3 --threads 24
-plink2 --pfile all_phase3 --freq --within all_phase3.clst --fst --threads 24
+awk '$5~/,/{print}' all_phase3.pvar | awk '{print $3}' > multiallelic
+plink2 --pfile all_phase3 --exclude multiallelic.txt --make-pgen --out TEMP --threads 24
+plink2 --pfile TEMP --rm-dup --make-bpgen --out TEMP2 --threads 24
+plink2 --pfile TEMP --exclude TEMP2.rmdup.mismatch --make-pgen --out TEMP2 --threads 24
+plink2 --pfile TEMP --rm-dup --make-bpgen --out TEMP2 --threads 24
+plink2 --pfile TEMP2 --rm-dup --make-bed --out all_phase3 --threads 24
+rm TEMP*
 
+## method 2 with --max-alleles 2
+plink2 --pfile all_phase3 --max-alleles 2 --make-pgen --out TEMP --threads 24
+plink2 --pfile TEMP --rm-dup --make-bpgen --out TEMP2 --threads 24
+plink2 --pfile TEMP --exclude TEMP2.rmdup.mismatch --make-pgen --out TEMP2 --threads 24
+plink2 --pfile TEMP --rm-dup --make-bpgen --out TEMP2 --threads 24
+plink2 --pfile TEMP2 --make-bed --out all_phase3 --threads 24
+rm TEMP*
+plink2 --pfile all_phase3 --make-bed --out all_phase3 --threads 24
 
 phen<-c()
 psam<-read.table("all_phase3.psam",head=F,as.is=T)
