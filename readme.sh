@@ -54,13 +54,12 @@ plink2 --pfile TEMP --exclude TEMP2.rmdup.mismatch --make-pgen --out TEMP2 --thr
 plink2 --pfile TEMP2 --rm-dup --make-bed --out all_phase3 --threads 24
 rm TEMP*
 ## pgen to --make-bed
-perl -p -i -e 's/X/23/g' all_phase3.bim
-perl -p -i -e 's/Y/24/g' all_phase3.bim
-perl -p -i -e 's/MT/25/g' all_phase3.bim
-perl -p -i -e 's/PAR1/26/g' all_phase3.bim
-perl -p -i -e 's/PAR2/27/g' all_phase3.bim
+sed -i 's/X/23/g' all_phase3.bim
+sed -i 's/Y/24/g' all_phase3.bim
+sed -i 's/MT/25/g' all_phase3.bim
+sed -i 's/PAR1/26/g' all_phase3.bim
+sed -i 's/PAR2/27/g' all_phase3.bim
 plink --bfile all_phase3 --allow-extra-chr --fst --within all_phase3.clst --out all_phase3 --threads 24
-
 
 phen<-c()
 psam<-read.table("all_phase3.psam",head=F,as.is=T)
