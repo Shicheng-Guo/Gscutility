@@ -92,6 +92,15 @@ cp RA3000.R4.fam RA3000.R5.fam
 plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 2 --logistic --adjust --ci 0.95 --out RA-ILD
 plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --logistic --adjust --ci 0.95 --extract fstl1.bed --range --out RA-CTR
 
+
+data<-read.table("PGS000114.txt",head=T)
+min(data$effect_weight)
+max(data$effect_weight)
+
+data<-read.table("PGS000016.txt",head=T)
+min(data$effect_weight)
+max(data$effect_weight)
+
 ##
 wget https://faculty.washington.edu/browning/conform-gt/conform-gt.24May16.cee.jar -O conform-gt.24May16.cee.jar
 java -jar ./conform-gt.24May16.cee.jar gt=RA2020-B9.chr$i.vcf.gz match=POS chrom=$i ref=~/hpc/db/hg19/beagle/EAS/chr$i.1kg.phase3.v5a.EAS.vcf.gz  out=RA2020-B9.chr$i.beagle >>$i.job
