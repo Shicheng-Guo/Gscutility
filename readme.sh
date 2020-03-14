@@ -8,7 +8,6 @@ head(data2)
 match(data1$rsID,data2$rsID)
 plink --bfile FinalRelease_QC_20140311_Team1_Marshfield --impute-sex --make-bed --chr 1-26 --out MCRI10124
 plink --bfile  S_Hebbring_Unr.Guo--impute-sex  --make-bed --chr 1-26 --out MCRI8500
-
 ####################################################################################################################
 ####################################################################################################################
 #### PMRP 03/13/2020
@@ -52,11 +51,11 @@ unzip HRC-1000G-check-bim-v4.2.7.zip
 gunzip HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
 wget http://qbrc.swmed.edu/zhanxw/software/checkVCF/checkVCF-20140116.tar.gz
 tar xzvf checkVCF-20140116.tar.gz
-######################################################################################
-
 perl HRC-1000G-check-bim.pl -b RA3000.R3.bim -f RA3000.R3.frq -r HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
 sh Run-plink.sh
+######################################################################################
 perl HRC-1000G-check-bim.pl -b RA3000.R3.bim -f RA3000.R3.frq -r 1000GP_Phase3_combined.legend -g -p EAS
+sh Run-plink.sh
 
 plink --bfile RA3000.R3 --exclude Exclude-RA3000.R3-1000G.txt --make-bed --out TEMP1
 plink --bfile TEMP1 --update-map Chromosome-RA3000.R3-1000G.txt --update-chr --make-bed --out TEMP2
