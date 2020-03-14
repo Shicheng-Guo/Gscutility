@@ -7,7 +7,7 @@ head(data1)
 head(data2)
 match(data1$rsID,data2$rsID)
 plink --bfile FinalRelease_QC_20140311_Team1_Marshfield --impute-sex --make-bed --chr 1-26 --out MCRI10124
-plink --bfile  S_Hebbring_Unr.Guo--impute-sex  --make-bed --chr 1-26 --out MCRI8500
+plink --bfile  S_Hebbring_Unr.Guo --impute-sex  --make-bed --chr 1-26 --out MCRI8500
 ####################################################################################################################
 ####################################################################################################################
 #### PMRP 03/13/2020
@@ -16,16 +16,13 @@ plink --vcf exome.rename.vcf.gz --make-bed --out exome
 
 scp * root@101.133.145.142:/root/pmrp
 scp root@101.133.145.142:/root/pmrp2 ./
-
+scp MCRI20000_R2* root@101.133.145.142:/root/pmrp2
 plink --bfile FinalRelease_QC_20140311_Team1_Marshfield --chr 1-26 ----make-bed --out MCRI10124
 plink --bfile S_Hebbring_Unr.Guo --chr 1-26 --make-bed --out MCRI8500
-
 awk '{print $1,$1":"$4,$3,$4,$5,$6}' MCRI8500.bim > MCRI8500.bim.R
 awk '{print $1,$1":"$4,$3,$4,$5,$6}' MCRI10124.bim > MCRI10124.bim.R
-
 data1<-read.table("MCRI10124.bim.R",head=F,as.is=T)
 data2<-read.table("MCRI8500.bim.R",head=F,as.is=T)
-
 ################################################
 x1<-which(data2$V2 %in% data1$V2)
 y1<-match(data2$V2[x1],data1$V2)
@@ -40,8 +37,7 @@ mv MCRI10124.bim.new MCRI10124.bim
 mv MCRI8500.bim.new MCRI8500.bim
 plink --bfile MCRI8500 --extract rsid.txt --exclude MCRI20000-merge.missnp --chr 1-26 --make-bed --out MCRI8500.R1
 plink --bfile MCRI10124 --extract rsid.txt --exclude MCRI20000-merge.missnp --chr 1-26 --make-bed --out MCRI10124.R1
-plink --bfile MCRI8500.R1 --bmerge MCRI10124.R1 --make-bed --out MCRI20000
-
+plink --bfile MCRI8500.R1 --bmerge MCRI10124.R1 --freq --make-bed --out MCRI20000
 ######################################################################################
 wget http://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.2.7.zip
 wget http://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
@@ -51,18 +47,41 @@ unzip HRC-1000G-check-bim-v4.2.7.zip
 gunzip HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
 wget http://qbrc.swmed.edu/zhanxw/software/checkVCF/checkVCF-20140116.tar.gz
 tar xzvf checkVCF-20140116.tar.gz
-perl HRC-1000G-check-bim.pl -b RA3000.R3.bim -f RA3000.R3.frq -r HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
-sh Run-plink.sh
 ######################################################################################
+perl HRC-1000G-check-bim.pl -b MCRI20000.bim -f MCRI20000.frq -r HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
+sh Run-plink.sh
 perl HRC-1000G-check-bim.pl -b RA3000.R3.bim -f RA3000.R3.frq -r 1000GP_Phase3_combined.legend -g -p EAS
 sh Run-plink.sh
 
-plink --bfile RA3000.R3 --exclude Exclude-RA3000.R3-1000G.txt --make-bed --out TEMP1
-plink --bfile TEMP1 --update-map Chromosome-RA3000.R3-1000G.txt --update-chr --make-bed --out TEMP2
-plink --bfile TEMP2 --update-map Position-RA3000.R3-1000G.txt --make-bed --out TEMP3
-plink --bfile TEMP3 --flip Strand-Flip-RA3000.R3-1000G.txt --make-bed --out TEMP4
-plink --bfile TEMP4 --reference-allele Force-Allele1-RA3000.R3-1000G.txt --make-bed --out RA3000.R4
+plink --bfile MCRI20000 --exclude Exclude-MCRI20000-HRC.txt --make-bed --out TEMP1
+plink --bfile TEMP1 --update-map Chromosome-MCRI20000-HRC.txt --update-chr --make-bed --out TEMP2
+plink --bfile TEMP2 --update-map Position-MCRI20000-HRC.txt --make-bed --out TEMP3
+plink --bfile TEMP3 --flip Strand-Flip-MCRI20000-HRC.txt --make-bed --out TEMP4
+plink --bfile TEMP4 --reference-allele Force-Allele1-MCRI20000-HRC.txt --make-bed --out MCRI20000.R1
 rm TEMP*
+
+grep PROB MCRI20000_R2.sexcheck > MCRI20000_R2.sexcheck.PROB
+plink --bfile  MCRI20000.R1 --impute-sex --remove MCRI20000_R2.sexcheck.PROB --make-bed --chr 1-26 --out MCRI20000_R2
+
+plink2 --bfile MCRI20000_R2 --make-pfile --out MCRI20000_R3
+
+wget ftp://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS000007/ScoringFiles/PGS000007.txt.gz
+
+grep -v '#\|name\|position\|pos\|allele\|ref' PGS000016.txt | awk '{print $1":"$2"-"$4"-"$3,$3,$5}' > PGS000016.weight.txt
+grep -v '#\|name\|position\|pos\|allele\|ref' PGS000007.txt | awk '{print $1":"$2"-"$4"-"$3,$3,$5}' > PGS000007.weight.txt
+
+
+plink2 --pfile MCRI20000_R3 --score PGS000016.weight.txt header list-variants --out PGS000016
+plink2 --pfile MCRI20000_R3 --score PGS000007.weight.txt header list-variants --out PGS000007
+
+
+data<-read.table("plink2.sscore",head=F)
+newdata<-data[order(data$V5,decreasing=T),]
+data<-read.table("PGS000007.sscore",head=T,as.is=T)
+newdata<-data[order(data$SCORE1_AVG,decreasing=T),]
+head(newdata)
+write.csv(newdata,file="PGS000007.sscore.csv",quote=F,row.names=F)
+
 plink --bfile RA3000.R4 --assoc --adjust
 plink --bfile RA3000.R4 --recode vcf-fid --out RA3000.R4
 bcftools view RA3000.R4.vcf --threads 48 -Oz -o RA3000.R4.vcf.gz
@@ -72,7 +91,6 @@ plink --vcf RA3000.R4.RS.vcf.gz --make-bed --out RA3000.R5
 cp RA3000.R4.fam RA3000.R5.fam
 plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 2 --logistic --adjust --ci 0.95 --out RA-ILD
 plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --logistic --adjust --ci 0.95 --extract fstl1.bed --range --out RA-CTR
-
 
 ##
 wget https://faculty.washington.edu/browning/conform-gt/conform-gt.24May16.cee.jar -O conform-gt.24May16.cee.jar
