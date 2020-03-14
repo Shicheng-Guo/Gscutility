@@ -1,10 +1,19 @@
 ####################################################################################################################
 ####################################################################################################################
+#### GPS-lung cancer 03/13/2020
+data1<-read.table("PGS000070.txt",sep="\t",head=T)
+data2<-read.table("PGS000078.txt",sep="\t",head=T)
+head(data1)
+head(data2)
+match(data1$rsID,data2$rsID)
+####################################################################################################################
+####################################################################################################################
 #### PMRP 03/13/2020
 scp nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/pmrp/* ./
 plink --vcf exome.rename.vcf.gz --make-bed --out exome
 
 scp * root@101.133.145.142:/root/pmrp
+scp * root@101.133.145.142:/root/pmrp2
 
 wget https://faculty.washington.edu/browning/conform-gt/conform-gt.24May16.cee.jar -O conform-gt.24May16.cee.jar
 java -jar ./conform-gt.24May16.cee.jar gt=RA2020-B9.chr$i.vcf.gz match=POS chrom=$i ref=~/hpc/db/hg19/beagle/EAS/chr$i.1kg.phase3.v5a.EAS.vcf.gz  out=RA2020-B9.chr$i.beagle >>$i.job
