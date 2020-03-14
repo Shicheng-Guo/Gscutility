@@ -6,6 +6,9 @@ data2<-read.table("PGS000078.txt",sep="\t",head=T)
 head(data1)
 head(data2)
 match(data1$rsID,data2$rsID)
+plink --bfile FinalRelease_QC_20140311_Team1_Marshfield --impute-sex --make-bed --chr 1-26 --out MCRI10124
+plink --bfile  S_Hebbring_Unr.Guo--impute-sex  --make-bed --chr 1-26 --out MCRI8500
+
 ####################################################################################################################
 ####################################################################################################################
 #### PMRP 03/13/2020
@@ -13,11 +16,70 @@ scp nu_guos@submit-1.chtc.wisc.edu:/home/nu_guos/pmrp/* ./
 plink --vcf exome.rename.vcf.gz --make-bed --out exome
 
 scp * root@101.133.145.142:/root/pmrp
-scp * root@101.133.145.142:/root/pmrp2
+scp root@101.133.145.142:/root/pmrp2 ./
 
+plink --bfile FinalRelease_QC_20140311_Team1_Marshfield --chr 1-26 ----make-bed --out MCRI10124
+plink --bfile S_Hebbring_Unr.Guo --chr 1-26 --make-bed --out MCRI8500
+
+awk '{print $1,$1":"$4,$3,$4,$5,$6}' MCRI8500.bim > MCRI8500.bim.R
+awk '{print $1,$1":"$4,$3,$4,$5,$6}' MCRI10124.bim > MCRI10124.bim.R
+
+data1<-read.table("MCRI10124.bim.R",head=F,as.is=T)
+data2<-read.table("MCRI8500.bim.R",head=F,as.is=T)
+
+################################################
+x1<-which(data2$V2 %in% data1$V2)
+y1<-match(data2$V2[x1],data1$V2)
+data2[x1,]$V5=data1[y1,]$V5
+data2[x1,]$V6=data1[y1,]$V6
+write.table(data1,file="MCRI10124.bim.new",sep=" ",quote=F,col.names=F,row.names=F)
+write.table(data2,file="MCRI8500.bim.new",sep=" ",quote=F,col.names=F,row.names=F)
+rs<-data2$V2[(data2$V2 %in% data1$V2)]
+write.table(rs,file="rsid.txt",sep=" ",quote=F,col.names=F,row.names=F)
+######################################################################################
+mv MCRI10124.bim.new MCRI10124.bim
+mv MCRI8500.bim.new MCRI8500.bim
+plink --bfile MCRI8500 --extract rsid.txt --exclude MCRI20000-merge.missnp --chr 1-26 --make-bed --out MCRI8500.R1
+plink --bfile MCRI10124 --extract rsid.txt --exclude MCRI20000-merge.missnp --chr 1-26 --make-bed --out MCRI10124.R1
+plink --bfile MCRI8500.R1 --bmerge MCRI10124.R1 --make-bed --out MCRI20000
+
+######################################################################################
+wget http://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.2.7.zip
+wget http://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
+wget https://www.well.ox.ac.uk/~wrayner/tools/1000GP_Phase3_combined.legend.gz
+gunzip 1000GP_Phase3_combined.legend.gz
+unzip HRC-1000G-check-bim-v4.2.7.zip
+gunzip HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
+wget http://qbrc.swmed.edu/zhanxw/software/checkVCF/checkVCF-20140116.tar.gz
+tar xzvf checkVCF-20140116.tar.gz
+######################################################################################
+
+perl HRC-1000G-check-bim.pl -b RA3000.R3.bim -f RA3000.R3.frq -r HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
+sh Run-plink.sh
+perl HRC-1000G-check-bim.pl -b RA3000.R3.bim -f RA3000.R3.frq -r 1000GP_Phase3_combined.legend -g -p EAS
+
+plink --bfile RA3000.R3 --exclude Exclude-RA3000.R3-1000G.txt --make-bed --out TEMP1
+plink --bfile TEMP1 --update-map Chromosome-RA3000.R3-1000G.txt --update-chr --make-bed --out TEMP2
+plink --bfile TEMP2 --update-map Position-RA3000.R3-1000G.txt --make-bed --out TEMP3
+plink --bfile TEMP3 --flip Strand-Flip-RA3000.R3-1000G.txt --make-bed --out TEMP4
+plink --bfile TEMP4 --reference-allele Force-Allele1-RA3000.R3-1000G.txt --make-bed --out RA3000.R4
+rm TEMP*
+plink --bfile RA3000.R4 --assoc --adjust
+plink --bfile RA3000.R4 --recode vcf-fid --out RA3000.R4
+bcftools view RA3000.R4.vcf --threads 48 -Oz -o RA3000.R4.vcf.gz
+tabix -p vcf RA3000.R4.vcf.gz
+annotate --threads 48 -c ID -a ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz RA3000.R4.vcf.gz -Oz -o RA3000.R4.RS.vcf.gz
+plink --vcf RA3000.R4.RS.vcf.gz --make-bed --out RA3000.R5
+cp RA3000.R4.fam RA3000.R5.fam
+plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 2 --logistic --adjust --ci 0.95 --out RA-ILD
+plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --logistic --adjust --ci 0.95 --extract fstl1.bed --range --out RA-CTR
+
+
+##
 wget https://faculty.washington.edu/browning/conform-gt/conform-gt.24May16.cee.jar -O conform-gt.24May16.cee.jar
 java -jar ./conform-gt.24May16.cee.jar gt=RA2020-B9.chr$i.vcf.gz match=POS chrom=$i ref=~/hpc/db/hg19/beagle/EAS/chr$i.1kg.phase3.v5a.EAS.vcf.gz  out=RA2020-B9.chr$i.beagle >>$i.job
 bcftools annotate -c ID -a /data/references/hg19/pipe/dbsnp138/00-All.vcf.gz samtools.vcf.gz -o samtools_annotated.vcf.gz
+
 ####################################################################################################################
 ####################################################################################################################
 #### FSTL1 Exome-Sequencing Project 03/13/2020
