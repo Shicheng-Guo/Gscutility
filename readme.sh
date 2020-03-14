@@ -96,7 +96,6 @@ plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --
 wget https://faculty.washington.edu/browning/conform-gt/conform-gt.24May16.cee.jar -O conform-gt.24May16.cee.jar
 java -jar ./conform-gt.24May16.cee.jar gt=RA2020-B9.chr$i.vcf.gz match=POS chrom=$i ref=~/hpc/db/hg19/beagle/EAS/chr$i.1kg.phase3.v5a.EAS.vcf.gz  out=RA2020-B9.chr$i.beagle >>$i.job
 bcftools annotate -c ID -a /data/references/hg19/pipe/dbsnp138/00-All.vcf.gz samtools.vcf.gz -o samtools_annotated.vcf.gz
-
 ####################################################################################################################
 ####################################################################################################################
 #### FSTL1 Exome-Sequencing Project 03/13/2020
