@@ -4,7 +4,6 @@ perl vcf_to_ped_converter.pl -vcf ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/relea
     -sample_panel_file ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20110521/phase1_integrated_calls.20101123.ALL.sample_panel
     -region 13:32889611-32973805 -population GBR -population FIN
 	
-
 for i in {1..22} X
 do
 echo \#PBS -N $i  > $i.job
@@ -18,10 +17,9 @@ echo unzip -P 'UIddFG75Uptf#' chr_$i.zip  >> $i.job
 sh $i.job 
 done
 
-
 for i in {1..22}
 do
-plink --vcf chr$i.dose.vcf.gz --make-bed --out chr$i &
+plink --vcf chr$i.dose.vcf.gz --double-id --make-bed --threads 1 --out chr$i &
 done
 
 rm merge.txt
@@ -31,7 +29,7 @@ echo chr$i >> merge.txt
 done
 	
 plink --bfile chr1 --merge-list merge.txt --make-bed --threads 48 --out RA3000_R6
-	
+
 ####################################################################################################################
 ####################################################################################################################
 #### GPS-lung cancer 03/13/2020
