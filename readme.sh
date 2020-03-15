@@ -30,6 +30,25 @@ done
 	
 plink --bfile chr1 --merge-list merge.txt --make-bed --threads 48 --out RA3000_R6
 
+plink --bfile RA3000_R6 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --logistic --adjust --ci 0.95 --gene-report RA-CTR.assoc.logistic glist-hg19 --gene-list-border 2 --out RA-CTR
+plink --bfile RA3000_R6 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --assoc fisher counts --adjust --ci 0.95 --gene-report RA-CTR.fisher.assoc.fisher glist-hg19 --gene-list-border 2 --out RA-CTR.fisher
+
+wget https://www.cog-genomics.org/static/bin/plink/glist-hg19 -O glist-hg19
+wget https://www.cog-genomics.org/static/bin/plink/glist-hg38 -O glist-hg38
+
+plink --bfile RA3000_R6 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --allow-no-sex --assoc fisher counts --adjust --ci 0.95 --out RA-CTR
+plink --bfile RA3000_R6 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --allow-no-sex --logistic  --adjust --ci 0.95 --out RA-CTR
+
+plink --gene-report RA-CTR.assoc.fisher glist-hg19 --gene-list-border 5 --out RA3000_R6_fisher
+plink --gene-report RA-CTR.assoc.logistic glist-hg19 --gene-list-border 5 --out RA3000_R6_logistic
+
+
+bcftools view --threads 48 -G FSTL1.RS.vcf.gz -Oz -o FSTL1.RG.vcf.gz
+zcat FSTL1.RG.vcf.gz| awk '{print $1,$2,$2,$4,$5,$3}\' OFS="\t"| grep -v '#' > FSTL1.RG.avinput
+table_annovar.pl FSTL1.RG.avinput ~/tools/annovar/humandb/ -buildver hg19 -out FSTL1 -remove -protocol refGene,cytoBand,avsnp150,dbnsfp35a -operation gx,r,f,f -nastring . -csvout -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt
+
+
+
 ####################################################################################################################
 ####################################################################################################################
 #### GPS-lung cancer 03/13/2020
