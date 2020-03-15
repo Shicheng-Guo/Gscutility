@@ -36,6 +36,13 @@ sed -i '{s/chrY/24/g}' dbSNP-to-UCSC-GRCh37.p13.map
 sed -i '{s/chrM/25/g}' dbSNP-to-UCSC-GRCh37.p13.map
 sed -i '{s/chr//g}' dbSNP-to-UCSC-GRCh37.p13.map
 bcftools annotate --threads 48 --rename-chrs dbSNP-to-UCSC-GRCh37.p13.map GCF_000001405.25.gz -o dbSNP153.hg19.vcf.gz
+bcftools norm dbSNP153.hg19.vcf.gz --threads 48 -m-both -Oz -o dbSNP153.norm.hg19.vcf.gz
+tabix -p vcf dbSNP153.norm.hg19.vcf.gz
+for i in {1.22}
+do
+bcftools view dbSNP153.norm.hg19.vcf.gz -r $i -Oz -o dbSNP153.chr$i.hg19.vcf.gz
+done
+bcftools annotate --threads 48 -c ID -a ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz RA3000.R4.vcf.gz -Oz -o RA3000.R4.RS.vcf.gz
 
 
 rm merge.txt
