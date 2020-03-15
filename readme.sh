@@ -1,3 +1,9 @@
+wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/browser/vcf_to_ped_converter/version_1.1/vcf_to_ped_convert.pl
+
+perl vcf_to_ped_converter.pl -vcf ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20110521/ALL.chr13.phase1_integrated_calls.20101123.snps_indels_svs.genotypes.vcf.gz
+    -sample_panel_file ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20110521/phase1_integrated_calls.20101123.ALL.sample_panel
+    -region 13:32889611-32973805 -population GBR -population FIN
+	
 ####################################################################################################################
 ####################################################################################################################
 #### GPS-lung cancer 03/13/2020
@@ -150,6 +156,10 @@ wget https://www.cog-genomics.org/static/bin/plink/glist-hg38 -O glist-hg38
 # Gene Reports
 plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --logistic --adjust --ci 0.95 --out RA-CTR
 plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --logistic --adjust --ci 0.95 --gene-report RA-CTR.assoc.logistic glist-hg19 --gene-list-border 2 --out RA-CTR
+plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --mpheno 1 --assoc fisher counts --adjust --ci 0.95 --gene-report RA-CTR.fisher.assoc.fisher glist-hg19 --gene-list-border 2 --out RA-CTR.fisher
+
+RA-CTR.fisher.assoc.fisher
+
 ## RVTEST
 wget http://qbrc.swmed.edu/zhanxw/seqminer/data/refFlat_hg19.txt.gz
 wget http://qbrc.swmed.edu/zhanxw/seqminer/data/refFlat.gencode.v19.gz
@@ -306,7 +316,6 @@ cminput2$gene<-anno[match(cminput2$SNP,anno$avsnp150),]$Gene.refGene
 write.csv(cminput,file=paste(memo,".csv",sep=""),quote=F,row.names=F)
 write.csv(cminput2,file=paste(memo,".sig.csv",sep=""),quote=F,row.names=F)
 #####################################################
-
 plink --vcf dbSNP153.hg19.plink.vcf --make-bed --allow-extra-chr --thread 12 --out dbSNP153.hg19
 wget https://faculty.washington.edu/browning/conform-gt/conform-gt.24May16.cee.jar -O conform-gt.24May16.cee.jar
 java -jar ./conform-gt.24May16.cee.jar gt=RA2020-B9.chr$i.vcf.gz match=POS chrom=$i ref=~/hpc/db/hg19/beagle/EAS/chr$i.1kg.phase3.v5a.EAS.vcf.gz  out=RA2020-B9.chr$i.beagle >>$i.job
