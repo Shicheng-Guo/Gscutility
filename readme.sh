@@ -22,6 +22,22 @@ do
 plink --vcf chr$i.dose.vcf.gz --double-id --make-bed --threads 1 --out chr$i &
 done
 
+cd /home/mxiong/asa/michigan
+
+bcftools annotate --threads 48 -c ID -a ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz Final.vcf.gz -Oz -o final.rs.vcf.gz
+
+## 02/16/2020
+wget https://ftp.ncbi.nih.gov/snp/redesign/latest_release/VCF/GCF_000001405.25.gz
+wget https://ftp.ncbi.nih.gov/snp/redesign/latest_release/VCF/GCF_000001405.25.gz.tbi
+wget https://raw.githubusercontent.com/Shicheng-Guo/AnnotationDatabase/master/GCF_000001405.25_GRCh37.p13_assembly_report.txt
+awk -v RS="(\r)?\n" 'BEGIN { FS="\t" } !/^#/ { if ($10 != "na") print $7,$10; else print $7,$5 }' GCF_000001405.25_GRCh37.p13_assembly_report.txt > dbSNP-to-UCSC-GRCh37.p13.map
+sed -i '{s/chrX/23/g}' dbSNP-to-UCSC-GRCh37.p13.map
+sed -i '{s/chrY/24/g}' dbSNP-to-UCSC-GRCh37.p13.map
+sed -i '{s/chrM/25/g}' dbSNP-to-UCSC-GRCh37.p13.map
+sed -i '{s/chr//g}' dbSNP-to-UCSC-GRCh37.p13.map
+bcftools annotate --threads 48 --rename-chrs dbSNP-to-UCSC-GRCh37.p13.map GCF_000001405.25.gz -o dbSNP153.hg19.vcf.gz
+
+
 rm merge.txt
 for i in {2..22}
 do
@@ -327,6 +343,7 @@ plink --bfile RA3000.R5 --maf 0.01 --hwe 0.01 --extract fstl1.bed --range --phen
 plink --bfile RA3000.R5 --maf 0.01 --fisher --model trend --extract fstl1.bed --range --hwe 0.01 --adjust --ci 0.95 --out FSTL1-RA-CTR
 #################################################
 # ANNOVAR
+
 annotate_variation.pl -buildver hg19 -downdb -webfrom annovar avsnp150 humandb/
 annotate_variation.pl -buildver hg19 -downdb -webfrom annovar dbnsfp35a humandb/
 annotate_variation.pl -buildver hg19 -downdb -webfrom annovar kaviar_20150923 humandb/
