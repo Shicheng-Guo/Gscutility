@@ -4,6 +4,34 @@ perl vcf_to_ped_converter.pl -vcf ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/relea
     -sample_panel_file ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20110521/phase1_integrated_calls.20101123.ALL.sample_panel
     -region 13:32889611-32973805 -population GBR -population FIN
 	
+
+for i in {1..22} X
+do
+echo \#PBS -N $i  > $i.job
+echo \#PBS -l nodes=1:ppn=1 >> $i.job
+echo \#PBS -M Guo.shicheng\@marshfieldresearch.org >> $i.job
+echo \#PBS -m abe  >> $i.job
+echo \#PBS -o $(pwd)/temp/ >>$i.job
+echo \#PBS -e $(pwd)/temp/ >>$i.job
+echo cd $(pwd) >> $i.job
+echo unzip -P 'UIddFG75Uptf#' chr_$i.zip  >> $i.job
+sh $i.job 
+done
+
+
+for i in {1..22}
+do
+plink --vcf chr$i.dose.vcf.gz --make-bed --out chr$i &
+done
+
+rm merge.txt
+for i in {2..22}
+do
+echo chr$i >> merge.txt
+done
+	
+plink --bfile chr1 --merge-list merge.txt --make-bed --threads 48 --out RA3000_R6
+	
 ####################################################################################################################
 ####################################################################################################################
 #### GPS-lung cancer 03/13/2020
@@ -867,18 +895,21 @@ wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.t
 wget https://github.com/samtools/htslib/releases/download/1.10.2/htslib-1.10.2.tar.bz2
 wget http://s3.amazonaws.com/plink1-assets/dev/plink_linux_x86_64.zip
 
-WP_227753_30732_G7_NPP3551      227755-a1
 
-
-
-
-
-
+tar xjvf samtools-1.10.tar.bz2
+cd samtools-1.10
+./configure --disable-bz2 --disable-lzma
+make
 
 tar xjvf htslib-1.10.2.tar.bz2
 cd 
 ./configure --disable-bz2 --disable-lzma
 ./make --disable-bz2 --disable-lzma
+
+tar xjvf bcftools-1.10.2.tar.bz2
+./configure --disable-bz2 --disable-lzma
+make --disable-bz2 --disable-lzma
+
 
 bcftools merge -l file.txt -Oz -o miRNA.CHB.SNP.vcf.gz
 
