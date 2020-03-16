@@ -1,3 +1,4 @@
+
 wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/browser/vcf_to_ped_converter/version_1.1/vcf_to_ped_convert.pl
 
 perl vcf_to_ped_converter.pl -vcf ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20110521/ALL.chr13.phase1_integrated_calls.20101123.snps_indels_svs.genotypes.vcf.gz
@@ -55,11 +56,36 @@ done
 
 for i in {1..22}
 do
-bcftools annotate --threads 48 -c ID -a ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz chr9.dose.vcf.gz -Oz -o RA3000.R4.RS.vcf.gz
+bcftools annotate -c ID -a ~/db/dbsnp153/dbSNP153.chr$i.hg19.vcf.gz chr$i.dose.vcf.gz -Oz -o RA3000.chr$i.dose.vcf.gz &
 done
 
+for i in {1..22}
+do
+tabix -p vcf dbSNP153.chr$i.hg19.vcf.gz &
+done
 
-
+wget http://www.openbioinformatics.org/annovar/download/0wgxR2rIVP/annovar.latest.tar.gz
+scp root@101.133.145.142:/root/tools/annovar.latest.tar.gz ./
+tar xzvf annovar.latest.tar.gz 
+cd/home/mxiong/tools/annovar
+annotate_variation.pl -downdb -buildver hg19 cytoBand humandb
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar refGene humandb
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar tfbsConsSites humandb/ 
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar targetScanS humandb/ 
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar wgRna humandb/ &
+annotate_variation.pl -downdb -buildver hg19 -webfrom ucsc gnomad_genome humandb/ 
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar dbnsfp35a humandb 
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar ljb23_all humandb 
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar exac03 humandb 
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar esp6500siv2 humandb 
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar clinvar_20160302 humandb   
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar cosmic70 humandb 
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar icgc21 humandb 
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar nci60 humandb
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar dann humandb 
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar gwasCatalog humandb
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar avsnp150 humandb
+annotate_variation.pl -downdb -buildver hg19 -webfrom annovar kaviar_20150923 humandb
 
 
 rm merge.txt
