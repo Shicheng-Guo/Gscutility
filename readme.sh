@@ -49,7 +49,7 @@ sed -i '{s/chr//g}' dbSNP-to-UCSC-GRCh37.p13.map
 bcftools annotate --threads 48 --rename-chrs dbSNP-to-UCSC-GRCh37.p13.map GCF_000001405.25.gz -o dbSNP153.hg19.vcf.gz
 bcftools norm dbSNP153.hg19.vcf.gz --threads 48 -m-both -Oz -o dbSNP153.norm.hg19.vcf.gz
 tabix -p vcf dbSNP153.norm.hg19.vcf.gz
-for i in {1..22}
+for i in {23..24}
 do
 bcftools view dbSNP153.norm.hg19.vcf.gz -r $i -Oz -o dbSNP153.chr$i.hg19.vcf.gz &
 done
@@ -89,7 +89,12 @@ annotate_variation.pl -downdb -buildver hg19 -webfrom annovar kaviar_20150923 hu
 
 for i in {1..22}
 do
-bcftools view -G RA3000.chr22.dose.vcf.gz | grep -v "#" | awk '{print $1,$2,$2,$4,$5,$3}' > chr$i.avinput
+bcftools view RA3000.chr$i.dose.vcf.gz | grep -v "#" | awk '{print $1,$2,$2,$4,$5,$3}' > chr$i.avinput &
+done
+
+for i in {1..22}
+do
+table_annovar.pl chr$i.avinput ~/tools/annovar/humandb/ -buildver hg19 -out chr$i -remove -protocol refGene,cytoBand,avsnp150,dbnsfp35a -operation gx,r,f,f -nastring . -csvout -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt  &
 done
 
 
@@ -119,6 +124,18 @@ zcat FSTL1.RG.vcf.gz| awk '{print $1,$2,$2,$4,$5,$3}\' OFS="\t"| grep -v '#' > F
 table_annovar.pl FSTL1.RG.avinput ~/tools/annovar/humandb/ -buildver hg19 -out FSTL1 -remove -protocol refGene,cytoBand,avsnp150,dbnsfp35a -operation gx,r,f,f -nastring . -csvout -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt
 
 
+####################################################################################################################
+####################################################################################################################
+#### Annotation to dbSNP153
+for i in {1..24}
+do
+bcftools view dbSNP153.chr$i.hg19.vcf.gz | grep -v "#" | awk '{print $1,$2,$2,$4,$5,$3}' > chr$i.avinput &
+done
+
+for i in {1..24}
+do
+table_annovar.pl chr$i.avinput ~/tools/annovar/humandb/ -buildver hg19 -out chr$i -remove -protocol refGene,cytoBand,avsnp150,dbnsfp35a -operation gx,r,f,f -nastring . -csvout -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt  &
+done
 
 ####################################################################################################################
 ####################################################################################################################
