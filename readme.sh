@@ -2768,17 +2768,21 @@ echo fastqc $i\_1.fastq.gz $i\_2.fastq.gz  -o  ../fastqc/ >>$i.job
 qsub  $i.job
 done
 
-
 #################################################################################################################################
 #################################################################################################################################
 ## RRBS analysis with Bismark: 03/16/2020
 ## install bowtie2 which is required by bismark
 wget https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh
 bash Miniconda2-latest-Linux-x86_64.sh
+
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+
 cd ~/miniconda2/bin
 conda install bowtie2
 ## install bowtie2 which is required by bismark
 cd /gpfs/home/guosa/hpc/methylation/clep/wgbs/test/data
+
 wget https://raw.githubusercontent.com/Shicheng-Guo/Gscutility/master/smartbismarkerv20.pl -O smartbismark.pl
 perl smartbismark.pl --input SraRunTable.txt --genome hg19 --server MCRI --queue shortq --submit submit
 
