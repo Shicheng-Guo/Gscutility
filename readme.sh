@@ -87,6 +87,11 @@ annotate_variation.pl -downdb -buildver hg19 -webfrom annovar gwasCatalog humand
 annotate_variation.pl -downdb -buildver hg19 -webfrom annovar avsnp150 humandb
 annotate_variation.pl -downdb -buildver hg19 -webfrom annovar kaviar_20150923 humandb
 
+for i in {1..22}
+do
+bcftools view -G RA3000.chr22.dose.vcf.gz | grep -v "#" | awk '{print $1,$2,$2,$4,$5,$3}' > chr$i.avinput
+done
+
 
 rm merge.txt
 for i in {2..22}
@@ -8210,33 +8215,6 @@ data3<-read.table("lof.vcf")
 data3=data3[-which(data3[,3] %in% data2[,3]),]
 data3=data3[-which(data3[,3] %in% data1[,3]),]
 
-
-
-
-      V1     V2           V3 V4    V5
-1  chr11 180210 rs1279064406  A     G
-2  chr11 180211 rs1323177122  A     G
-8  chr11 193152  rs762487881  G   A,C
-9  chr11 193154  rs201079312  C     T
-12 chr11 193713  rs776547973  G A,C,T
-20 chr11 193910 rs1189752583  T     C
-21 chr11 193911  rs767802769  G     A
-25 chr11 194418  rs371592375  G     A
-26 chr11 194420 rs1437241589  G   A,T
-29 chr11 197413  rs768048702  G   A,C
-36 chr11 198464  rs766746003  G     A
-37 chr11 198583  rs778946478  A     G
-43 chr11 199507 rs1371341421  A     G
-45 chr11 199946  rs772124586  G     A
-48 chr11 205337  rs766186224  T     A
-49 chr11 205344 rs1238039215  G   A,C
-50 chr11 205345 rs1475051584  G     A
-51 chr11 205432  rs775471050  C     T
-53 chr11 205439 rs1435984912  G     A
-54 chr11 205440 rs1300694307  C     T
-
-
-
 mkdir annovar
 mkdir temp
 for i in X Y
@@ -8252,10 +8230,6 @@ echo convert2annovar.pl -format vcf4 -allsample -withfreq gnomad.exomes.r2.1.sit
 echo table_annovar.pl ./annovar/gnomad.exomes.r2.1.sites.chr$i.rec.vcf.avinput /gpfs/home/guosa/hpc/tools/annovar/humandb/ --thread 4 -buildver hg19 --csvout -out ./annovar/chr$i -remove -protocol refGene,dbnsfp33a,gwasCatalog,wgRna,targetScanS,tfbsConsSites -operation gx,f,r,r,r,r -nastring . -otherinfo -polish -xref /gpfs/home/guosa/hpc/tools/annovar/humandb/gene_fullxref.txt >> chr$i.job
 qsub chr$i.job
 done
-
-
-
-
 
 # 2019-06-18
 
