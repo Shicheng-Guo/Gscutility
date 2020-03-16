@@ -3,7 +3,13 @@ wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/browser/vcf_to_ped_conve
 perl vcf_to_ped_converter.pl -vcf ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20110521/ALL.chr13.phase1_integrated_calls.20101123.snps_indels_svs.genotypes.vcf.gz
     -sample_panel_file ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20110521/phase1_integrated_calls.20101123.ALL.sample_panel
     -region 13:32889611-32973805 -population GBR -population FIN
-	
+
+######################################################################################################
+######################################################################################################
+## RA3000 @ UThealth
+
+cd /home/mxiong/asa/michigan
+
 for i in {1..22} X
 do
 echo \#PBS -N $i  > $i.job
@@ -22,7 +28,11 @@ do
 plink --vcf chr$i.dose.vcf.gz --double-id --make-bed --threads 1 --out chr$i &
 done
 
-cd /home/mxiong/asa/michigan
+for i in {1..22}
+do
+tabix -p vcf chr$i.dose.vcf.gz &
+done
+
 
 bcftools annotate --threads 48 -c ID -a ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz Final.vcf.gz -Oz -o final.rs.vcf.gz
 
@@ -38,11 +48,18 @@ sed -i '{s/chr//g}' dbSNP-to-UCSC-GRCh37.p13.map
 bcftools annotate --threads 48 --rename-chrs dbSNP-to-UCSC-GRCh37.p13.map GCF_000001405.25.gz -o dbSNP153.hg19.vcf.gz
 bcftools norm dbSNP153.hg19.vcf.gz --threads 48 -m-both -Oz -o dbSNP153.norm.hg19.vcf.gz
 tabix -p vcf dbSNP153.norm.hg19.vcf.gz
-for i in {1.22}
+for i in {1..22}
 do
-bcftools view dbSNP153.norm.hg19.vcf.gz -r $i -Oz -o dbSNP153.chr$i.hg19.vcf.gz
+bcftools view dbSNP153.norm.hg19.vcf.gz -r $i -Oz -o dbSNP153.chr$i.hg19.vcf.gz &
 done
-bcftools annotate --threads 48 -c ID -a ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz RA3000.R4.vcf.gz -Oz -o RA3000.R4.RS.vcf.gz
+
+for i in {1..22}
+do
+bcftools annotate --threads 48 -c ID -a ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz chr9.dose.vcf.gz -Oz -o RA3000.R4.RS.vcf.gz
+done
+
+
+
 
 
 rm merge.txt
