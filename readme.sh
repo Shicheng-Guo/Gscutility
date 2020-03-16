@@ -134,8 +134,14 @@ done
 
 for i in {1..24}
 do
-table_annovar.pl chr$i.avinput ~/tools/annovar/humandb/ -buildver hg19 -out chr$i -remove -protocol refGene,cytoBand,avsnp150,dbnsfp35a -operation gx,r,f,f -nastring . -csvout -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt  &
+table_annovar.pl chr$i.avinput ~/tools/annovar/humandb/ -buildver hg19 -out chr$i -remove -protocol refGene,cytoBand,avsnp150,dbnsfp35a -operation gx,r,f,f -nastring . -csvout -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt 
 done
+
+
+Genome-wide DNA methylation profiles of low and high-grade adenoma reveals early epigenetic imbalance 
+
+biomarker for early detection of colorectal carcinoma
+
 
 ####################################################################################################################
 ####################################################################################################################
@@ -2764,9 +2770,22 @@ done
 
 
 #################################################################################################################################
+#################################################################################################################################
+## RRBS analysis with Bismark: 03/16/2020
+## install bowtie2 which is required by bismark
+wget https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh
+bash Miniconda2-latest-Linux-x86_64.sh
+cd ~/miniconda2/bin
+conda install bowtie2
+## install bowtie2 which is required by bismark
 cd /gpfs/home/guosa/hpc/methylation/clep/wgbs/test/data
 wget https://raw.githubusercontent.com/Shicheng-Guo/Gscutility/master/smartbismarkerv20.pl -O smartbismark.pl
 perl smartbismark.pl --input SraRunTable.txt --genome hg19 --server MCRI --queue shortq --submit submit
+
+wget http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes -O hg38.chrom.sizes
+wget http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz -O hg38.fa.gz
+gunzip hg38.fa.gz
+bismark_genome_preparation --verbose /home/mxiong/db/methdb
 
 #################################################################################################################################
 #################################################################################################################################
