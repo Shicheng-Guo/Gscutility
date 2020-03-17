@@ -151,7 +151,6 @@ plink17 --bfile FSTL1 --hap-window 2,3,4,5 --hap-assoc --pheno RA3000.mphen --mp
 bcftools view dbSNP153.chr3.hg19.vcf.gz -r 3:120113060-120169918
 table_annovar.pl FSTL1.avinput ~/tools/annovar/humandb/ -buildver hg19 -out FSTL1 -remove -protocol refGene,cytoBand,avsnp150,dbnsfp35a -operation gx,r,f,f -nastring . -csvout -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt
 
-
 ####################################################################################################################
 ####################################################################################################################
 #### Annotation to dbSNP153
