@@ -37,6 +37,8 @@ done
 
 bcftools annotate --threads 48 -c ID -a ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz Final.vcf.gz -Oz -o final.rs.vcf.gz
 
+awk '{print $3}' chr*.hg19_multianno.csv.lof.txt | grep -v '\.' | grep rs > nonsyn.rsid.txt
+
 ## 02/16/2020
 wget https://ftp.ncbi.nih.gov/snp/redesign/latest_release/VCF/GCF_000001405.25.gz
 wget https://ftp.ncbi.nih.gov/snp/redesign/latest_release/VCF/GCF_000001405.25.gz.tbi
@@ -94,7 +96,7 @@ done
 
 for i in {1..22}
 do
-table_annovar.pl chr$i.avinput ~/tools/annovar/humandb/ -buildver hg19 -out chr$i -remove -protocol refGene,cytoBand,avsnp150,dbnsfp35a -operation gx,r,f,f -nastring . -csvout -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt  &
+table_annovar.pl chr$i.avinput ~/tools/annovar/humandb/ -buildver hg19 -out chr$i -remove -protocol cytoBand,avsnp150,refGene,dbnsfp35a -operation r,f,gx,f -nastring . -csvout -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt  &
 done
 
 
@@ -2789,6 +2791,7 @@ perl smartbismark.pl --input SraRunTable.txt --genome hg19 --server MCRI --queue
 wget http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes -O hg38.chrom.sizes
 wget http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz -O hg38.fa.gz
 gunzip hg38.fa.gz
+bismark_genome_preparation --verbose /home/mxiong/db/methdb
 bismark_genome_preparation --verbose /home/mxiong/db/methdb
 
 #################################################################################################################################
