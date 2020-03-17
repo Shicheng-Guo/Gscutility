@@ -105,6 +105,8 @@ do
 plink --vcf RA3000.chr$i.dose.vcf.gz --double-id --make-bed --threads 1 --out chr$i &
 done
 
+
+
 rm merge.txt
 for i in {2..22}
 do
@@ -135,6 +137,19 @@ plink --gene-report RA-CTR_Nonsyn.assoc.logistic glist-hg19 --gene-list-border 5
 bcftools view --threads 48 -G FSTL1.RS.vcf.gz -Oz -o FSTL1.RG.vcf.gz
 zcat FSTL1.RG.vcf.gz| awk '{print $1,$2,$2,$4,$5,$3}\' OFS="\t"| grep -v '#' > FSTL1.RG.avinput
 table_annovar.pl FSTL1.RG.avinput ~/tools/annovar/humandb/ -buildver hg19 -out FSTL1 -remove -protocol refGene,cytoBand,avsnp150,dbnsfp35a -operation gx,r,f,f -nastring . -csvout -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt
+
+
+plink --file mydata --hap myfile.hlist
+
+plink --bfile RA3000_R7 --maf 0.01 --hwe 0.01 --pheno RA3000.mphen --extract FSTL1.hg19.bed --range --mpheno 1 --allow-no-sex --assoc fisher counts --adjust --ci 0.95 --out RA-CTR_Nonsyn
+
+
+plink --bfile RA3000_R7 --extract range FSTL1.hg19.bed --make-bed --out FSTL1 
+plink17 --bfile FSTL1 --hap-window 2,3,4,5 --hap-assoc --pheno RA3000.mphen --mpheno 1 --adjust --noweb
+
+
+bcftools view dbSNP153.chr3.hg19.vcf.gz -r 3:120113060-120169918
+table_annovar.pl FSTL1.avinput ~/tools/annovar/humandb/ -buildver hg19 -out FSTL1 -remove -protocol refGene,cytoBand,avsnp150,dbnsfp35a -operation gx,r,f,f -nastring . -csvout -polish -xref ~/tools/annovar/humandb/gene_fullxref.txt
 
 
 ####################################################################################################################

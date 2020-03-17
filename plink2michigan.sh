@@ -20,7 +20,7 @@ echo bcftools view RA3000_R5.chr$i.vcf -Oz -o RA3000_R5.chr$i.vcf.gz >>$i.job
 echo tabix -p vcf RA3000_R5.chr$i.vcf.gz >>$i.job
 echo # java -jar ./conform-gt.24May16.cee.jar gt=RA2020-B9.chr$i.vcf.gz match=POS chrom=$i ref=~/hpc/db/hg19/beagle/EAS/chr$i.1kg.phase3.v5a.EAS.vcf.gz  out=RA2020-B9.chr$i.beagle >>$i.job
 echo # tabix -p vcf RA2020-B9.chr$i.beagle.vcf.gz >>$i.job
-qsub $i.job
+sh $i.job &
 done
 
 mkdir temp
