@@ -1,4 +1,12 @@
 
+
+wget https://raw.githubusercontent.com/Shicheng-Guo/Gscutility/master/addfakegenotype.pl
+perl addfakegenotype.pl > dbSNP153.hg19.plink.vcf
+plink --vcf dbSNP153.hg19.plink.vcf --make-bed --allow-extra-chr --out dbSNP153.hg19
+
+######################################################################################################
+######################################################################################################
+## RA3000 @ UThealth
 wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/browser/vcf_to_ped_converter/version_1.1/vcf_to_ped_convert.pl
 
 perl vcf_to_ped_converter.pl -vcf ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20110521/ALL.chr13.phase1_integrated_calls.20101123.snps_indels_svs.genotypes.vcf.gz
@@ -104,6 +112,12 @@ for i in {1..22}
 do
 plink --vcf RA3000.chr$i.dose.vcf.gz --double-id --make-bed --threads 1 --out chr$i &
 done
+
+for i in {1..22} X Y M
+do
+bcftools view NARD_MAF.hg38.vcf.gz -r chr$i -Oz -o NARD_MAF.chr$i.vcf.gz &
+done
+
 
 
 
