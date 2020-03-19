@@ -1,8 +1,72 @@
-
+######################################################################################################
+######################################################################################################
+## RA3000 @ UThealth
 
 wget https://raw.githubusercontent.com/Shicheng-Guo/Gscutility/master/addfakegenotype.pl
 perl addfakegenotype.pl > dbSNP153.hg19.plink.vcf
-plink --vcf dbSNP153.hg19.plink.vcf --make-bed --allow-extra-chr --out dbSNP153.hg19
+plink --vcf NARD_MAF.plink.hg38.vcf --make-bed --allow-extra-chr --out NARD_MAF.plink.hg38.vcf
+
+for i in {1..22} X Y M
+do
+plink --vcf NARD_MAF.plink.hg38.vcf.gz --chr chr$i --allow-extra-chr --make-bed --out NARD_MAF.hg38.chr$i
+done
+
+plink --vcf NARD_MAF.plink.hg38.vcf --chr chrX --allow-extra-chr --make-bed --out NARD_MAF.hg38.chrX
+
+
+for i in {1..22} X Y 
+do
+awk '{print $1,$1":"$4,0,$4,$5,$6}' NARD_MAF.hg38.chr$i.bim >  NARD_MAF.hg38.chr$i.bim.new
+done 
+
+for i in {1..22} X Y 
+do
+mv NARD_MAF.hg38.chr$i.bim.new NARD_MAF.hg38.chr$i.bim
+done 
+
+
+plink --bfile NARD_MAF.hg38.chr1 --merge-list merge.txt --make-bed --out NARD_MAF.hg38
+
+######################################################################################
+######################################################################################
+## PMRP to Michigan
+plink2 --pfile MCRI20000_R3 --recode vcf-fid --threads 48 --out MCRI20000_R4
+bcftools view MCRI20000_R4.vcf -Oz -o MCRI20000_R4.vcf.gz
+tabix -p vcf MCRI20000_R4.vcf.gz
+cp MCRI20000_R4.vcf.gz* ./
+
+plink --bfile MCRI20000 --freq --out MCRI20000
+
+wget http://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.2.7.zip
+wget http://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
+wget https://www.well.ox.ac.uk/~wrayner/tools/1000GP_Phase3_combined.legend.gz
+gunzip 1000GP_Phase3_combined.legend.gz
+unzip HRC-1000G-check-bim-v4.2.7.zip
+gunzip HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
+
+wget http://qbrc.swmed.edu/zhanxw/software/checkVCF/checkVCF-20140116.tar.gz
+tar xzvf checkVCF-20140116.tar.gz
+perl HRC-1000G-check-bim.pl -b MCRI20000.bim -f MCRI20000.frq -r HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
+# sh Run-plink.sh
+# perl HRC-1000G-check-bim.pl -b RA3000.R3.bim -f RA3000.R3.frq -r 1000GP_Phase3_combined.legend -g -p EAS
+# sh Run-plink.sh
+plink --bfile MCRI20000 --exclude Exclude-MCRI20000-HRC.txt --make-bed --out TEMP1
+plink --bfile TEMP1 --update-map Chromosome-MCRI20000-HRC.txt --update-chr --make-bed --out TEMP2
+plink --bfile TEMP2 --update-map Position-MCRI20000-HRC.txt --make-bed --out TEMP3
+plink --bfile TEMP3 --flip Strand-Flip-MCRI20000-HRC.txt --make-bed --out TEMP4
+plink --bfile TEMP4 --reference-allele Force-Allele1-MCRI20000-HRC.txt --make-bed --out MCRI20000_R5
+rm TEMP*
+bcftools view MCRI20000.vcf --threads 48 -Oz -o MCRI20000.vcf.gz 
+tabix -p MCRI20000.vcf.gz 
+
+for i in {1..23}
+do
+plink --bfile MCRI20000_R5 --chr $i --threads 48 --recode vcf-fid --out MCRI20000.chr$i
+bcftools view MCRI20000.chr$i.vcf -Oz -o MCRI20000.chr$i.vcf.gz
+tabix -p vcf MCRI20000.chr$i.vcf.gz
+done
+
+
 
 ######################################################################################################
 ######################################################################################################
@@ -269,7 +333,7 @@ head(newdata)
 write.csv(newdata,file="PGS000007.sscore.csv",quote=F,row.names=F)
 
 plink --bfile RA3000.R4 --assoc --adjust
-plink --bfile RA3000.R4 --recode vcf-fid --out RA3000.R4
+plink --bfile RA3000.R4 --recode vcf-fid --threads 48 --out RA3000.R4
 bcftools view RA3000.R4.vcf --threads 48 -Oz -o RA3000.R4.vcf.gz
 tabix -p vcf RA3000.R4.vcf.gz
 annotate --threads 48 -c ID -a ~/db/dbSNP153/dbSNP153.norm.hg19.vcf.gz RA3000.R4.vcf.gz -Oz -o RA3000.R4.RS.vcf.gz
