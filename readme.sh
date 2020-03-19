@@ -61,10 +61,17 @@ tabix -p MCRI20000.vcf.gz
 
 for i in {1..23}
 do
-plink --bfile MCRI20000_R5 --chr $i --threads 48 --recode vcf-fid --out MCRI20000.chr$i
-bcftools view MCRI20000.chr$i.vcf -Oz -o MCRI20000.chr$i.vcf.gz
-tabix -p vcf MCRI20000.chr$i.vcf.gz
+# plink --bfile MCRI20000_R5 --chr $i --threads 48 --recode vcf-fid --out MCRI20000.chr$i &
+# bcftools view MCRI20000.chr$i.vcf -Oz -o MCRI20000.chr$i.vcf.gz &
+tabix -p vcf MCRI20000.chr$i.vcf.gz &
 done
+
+
+for i in {1..23}
+do
+plink --vcf dbSNP153.norm.hg19.vcf.gz --chr $i --make-bed --out ./annovar/chr$i &
+done 
+
 
 
 
